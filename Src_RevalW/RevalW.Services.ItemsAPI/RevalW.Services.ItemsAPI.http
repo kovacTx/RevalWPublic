@@ -1,0 +1,6 @@
+@RevalW.Services.ItemsAPI_HostAddress = http://localhost:5242
+
+GET {{RevalW.Services.ItemsAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

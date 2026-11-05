@@ -1,0 +1,1206 @@
+{
+
+  "Routes": [
+    //"OrganizationAPI": "https://localhost:7005",
+    {
+      "DownstreamPathTemplate": "/api/organization/all",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7005
+        }
+      ],
+      "UpstreamPathTemplate": "/api/organization/all",
+      "UpstreamHttpMethod": [ "Get" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/organization/byId",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7005
+        }
+      ],
+      "UpstreamPathTemplate": "/api/organization/byId",
+      "UpstreamHttpMethod": [ "Get" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/organization/newItemProperties",
+      "UpstreamPathTemplate": "/api/organization/newItemProperties",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7005
+        }
+      ]
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/organization/newDeviceProperties",
+      "UpstreamPathTemplate": "/api/organization/newDeviceProperties",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7005
+        }
+      ]
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/organization/newUserProperties",
+      "UpstreamPathTemplate": "/api/organization/newUserProperties",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7005
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/organization/itemGridColumns",
+      "UpstreamPathTemplate": "/api/organization/itemGridColumns",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7005
+        }
+      ]
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/organization/deviceGridColumns",
+      "UpstreamPathTemplate": "/api/organization/deviceGridColumns",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7005
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/organization/create",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7005
+        }
+      ],
+      "UpstreamPathTemplate": "/api/organization/create",
+      "UpstreamHttpMethod": [ "Post" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/organization/update",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7005
+        }
+      ],
+      "UpstreamPathTemplate": "/api/organization/update",
+      "UpstreamHttpMethod": [ "Put" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/organization/delete",
+      "UpstreamPathTemplate": "/api/organization/delete",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7005
+        }
+      ]
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/organization/byDataTables",
+      "UpstreamPathTemplate": "/api/organization/byDataTables",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7005
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+
+    {
+      "DownstreamPathTemplate": "/api/otags/all",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7005
+        }
+      ],
+      "UpstreamPathTemplate": "/api/otags/all",
+      "UpstreamHttpMethod": [ "Get" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/otags/allFull",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7005
+        }
+      ],
+      "UpstreamPathTemplate": "/api/otags/allFull",
+      "UpstreamHttpMethod": [ "Get" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/otags/organizationsByTags",
+      "UpstreamPathTemplate": "/api/otags/organizationsByTags",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7005
+        }
+      ]
+    },
+    //"ConfigsAPI": "https://localhost:7003",
+    {
+      "DownstreamPathTemplate": "/api/configs/create",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "UpstreamPathTemplate": "/api/configs/create",
+      "UpstreamHttpMethod": [ "Post" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/configs/headers",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "UpstreamPathTemplate": "/api/configs/headers",
+      "UpstreamHttpMethod": [ "Get" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/configs/byId",
+      "UpstreamPathTemplate": "/api/configs/byId",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ]
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/configs/headerById",
+      "UpstreamPathTemplate": "/api/configs/headerById",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ]
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/configs/byDataTables",
+      "UpstreamPathTemplate": "/api/configs/byDataTables",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ]
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/configs/byTag",
+      "UpstreamPathTemplate": "/api/configs/byTag",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ]
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/configs/byTags",
+      "UpstreamPathTemplate": "/api/configs/byTags",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ]
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/configs/byOrganizationId",
+      "UpstreamPathTemplate": "/api/configs/byOrganizationId",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/configs/dynaminProperties4Config",
+      "UpstreamPathTemplate": "/api/configs/dynaminProperties4Config",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/configs/update",
+      "UpstreamPathTemplate": "/api/configs/update",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/configs/autosave",
+      "UpstreamPathTemplate": "/api/configs/autosave",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/configs/updateImage",
+      "UpstreamPathTemplate": "/api/configs/updateImage",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/configs/updateDll",
+      "UpstreamPathTemplate": "/api/configs/updateDll",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/configs/downloadDll",
+      "UpstreamPathTemplate": "/api/configs/downloadDll",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ]
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/configs/delete",
+      "UpstreamPathTemplate": "/api/configs/delete",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+
+    {
+      "DownstreamPathTemplate": "/api/ctags/create",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "UpstreamPathTemplate": "/api/ctags/create",
+      "UpstreamHttpMethod": [ "Post" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/ctags/all",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "UpstreamPathTemplate": "/api/ctags/all",
+      "UpstreamHttpMethod": [ "Get" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/ctags/byId",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "UpstreamPathTemplate": "/api/ctags/byId",
+      "UpstreamHttpMethod": [ "Get" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/ctags/byName",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "UpstreamPathTemplate": "/api/ctags/byName",
+      "UpstreamHttpMethod": [ "Get" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/ctags/update",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "UpstreamPathTemplate": "/api/ctags/update",
+      "UpstreamHttpMethod": [ "Put" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/ctags/delete",
+      "UpstreamPathTemplate": "/api/ctags/delete",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/cdocuments/create",
+      "UpstreamPathTemplate": "/api/cdocuments/create",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/cdocuments/byId",
+      "UpstreamPathTemplate": "/api/cdocuments/byId",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/cdocuments/byConfigId",
+      "UpstreamPathTemplate": "/api/cdocuments/byConfigId",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/cdocuments/headersByConfigId",
+      "UpstreamPathTemplate": "/api/cdocuments/headersByConfigId",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/cdocuments/update",
+      "UpstreamPathTemplate": "/api/cdocuments/update",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/cdocuments/autosave",
+      "UpstreamPathTemplate": "/api/cdocuments/autosave",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/cdocuments/resourcesByConfigId",
+      "UpstreamPathTemplate": "/api/cdocuments/resourcesByConfigId",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/cdocuments/uploadResource",
+      "UpstreamPathTemplate": "/api/cdocuments/uploadResource",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/cdocuments/removeResource",
+      "UpstreamPathTemplate": "/api/cdocuments/removeResource",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/cdocuments/delete",
+      "UpstreamPathTemplate": "/api/cdocuments/delete",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/cdocuments/deleteByConfigId",
+      "UpstreamPathTemplate": "/api/cdocuments/deleteByConfigId",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/cdocuments/reallyDelete",
+      "UpstreamPathTemplate": "/api/cdocuments/reallyDelete",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/cdocuments/undelete",
+      "UpstreamPathTemplate": "/api/cdocuments/undelete",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+
+    //"ItemsAPI": "https://localhost:7004",
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/items/create",
+      "UpstreamPathTemplate": "/api/items/create",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/items/headersForApp",
+      "UpstreamPathTemplate": "/api/items/headersForApp",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ]
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/items/byId",
+      "UpstreamPathTemplate": "/api/items/byId",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ]
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/items/headerById",
+      "UpstreamPathTemplate": "/api/items/headerById",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/items/byTag",
+      "UpstreamPathTemplate": "/api/items/byTag",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ]
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/items/byDataTables",
+      "UpstreamPathTemplate": "/api/items/byDataTables",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ]
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/items/update",
+      "UpstreamPathTemplate": "/api/items/update",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/items/deviceChanged",
+      "UpstreamPathTemplate": "/api/items/deviceChanged",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/items/markExported",
+      "UpstreamPathTemplate": "/api/items/markExported",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/items/free",
+      "UpstreamPathTemplate": "/api/items/free",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/items/markAsNew",
+      "UpstreamPathTemplate": "/api/items/markAsNew",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/items/generateDocument",
+      "UpstreamPathTemplate": "/api/items/generateDocument",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/items/generateDocument-start",
+      "UpstreamPathTemplate": "/api/items/generateDocument-start",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/items/generateDocument-progress",
+      "UpstreamPathTemplate": "/api/items/generateDocument-progress",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/items/appendDevice",
+      "UpstreamPathTemplate": "/api/items/appendDevice",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/items/tryMarkFinished",
+      "UpstreamPathTemplate": "/api/items/tryMarkFinished",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/items/documentGenerated",
+      "UpstreamPathTemplate": "/api/items/documentGenerated",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ]
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/items/forwardState",
+      "UpstreamPathTemplate": "/api/items/forwardState",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/items/readonlyState",
+      "UpstreamPathTemplate": "/api/items/readonlyState",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/items/delete",
+      "UpstreamPathTemplate": "/api/items/delete",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/items/undelete",
+      "UpstreamPathTemplate": "/api/items/undelete",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/items/downloadDocument",
+      "UpstreamPathTemplate": "/api/items/downloadDocument",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ]
+    },
+
+    //"CombosAPI": "https://localhost:7004",
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/commonData/upsertCombo",
+      "UpstreamPathTemplate": "/api/commonData/upsertCombo",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/commonData/combosByConfigId",
+      "UpstreamPathTemplate": "/api/commonData/combosByConfigId",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ]
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/commonData/deleteComboById",
+      "UpstreamPathTemplate": "/api/commonData/deleteComboById",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/commonData/upsertCommonDataWrapper",
+      "UpstreamPathTemplate": "/api/commonData/upsertCommonDataWrapper",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/commonData/commonDataWrappersByConfigId",
+      "UpstreamPathTemplate": "/api/commonData/commonDataWrappersByConfigId",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ]
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/commonData/deleteCommonDataWrapperById",
+      "UpstreamPathTemplate": "/api/commonData/deleteCommonDataWrapperById",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7004
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+
+    //"DocumentsAPI": "https://localhost:7006",
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/documents/generate",
+      "UpstreamPathTemplate": "/api/documents/generate",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7006
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/documents/generate-start",
+      "UpstreamPathTemplate": "/api/documents/generate-start",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7006
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/documents/generate-progress",
+      "UpstreamPathTemplate": "/api/documents/generate-progress",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7006
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+
+    //"DevicesAPI": "https://localhost:7007",
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/devices/create",
+      "UpstreamPathTemplate": "/api/devices/create",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7007
+        }
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/devices/byId",
+      "UpstreamPathTemplate": "/api/devices/byId",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7007
+        }
+      ]
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/devices/headerById",
+      "UpstreamPathTemplate": "/api/devices/headerById",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7007
+        }
+      ]
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/devices/byDataTables",
+      "UpstreamPathTemplate": "/api/devices/byDataTables",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7007
+        }
+      ]
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/devices/configDataNTags",
+      "UpstreamPathTemplate": "/api/devices/configDataNTags",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7007
+        }
+      ]
+    },
+    {
+      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/devices/update",
+      "UpstreamPathTemplate": "/api/devices/update",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7007
+        }
+      ]
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "https://localhost:7777"
+  }
+}

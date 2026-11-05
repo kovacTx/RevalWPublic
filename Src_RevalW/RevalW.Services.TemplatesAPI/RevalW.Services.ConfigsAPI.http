@@ -1,0 +1,6 @@
+@RevalW.Services.TemplatesAPI_HostAddress = http://localhost:5242
+
+GET {{RevalW.Services.TemplatesAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,239 @@
+﻿@using RevalW.Shared.Model;
+@using RevalW.Shared.Utils;
+@using RevalW.Services.Shared.Utils;
+@{
+    var isLogged = User?.Identity?.IsAuthenticated == true;
+    var canAddDevices = User?.IsAuthorized(RightsList.Device_Create) ?? true;
+    var isCreator = isLogged && User?.IsInRole(ERoles.Creator) == true;
+    var isUberAdmin = isLogged && User?.IsInRole(ERoles.UberAdmin) == true;
+}
+@section Meta {
+    <meta name="description" content="Create and manage the items for the dynamic forms of the RevalW Agenda." />
+    <meta property="og:title" content="Items Management | RevalW Agenda" />
+}
+@model IEnumerable<ItemHeaderDto>
+@{
+    ViewData["Title"] = "Devices";
+}
+<style>
+    /* Resizable table styling */
+    #tblData {
+        table-layout: fixed; /* recommended for column resize plugins */
+        width: 100% !important;
+    }
+
+    #tblData th, #tblData td {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    #tblData .grip {
+        width: 8px;
+        height: 100%;
+        background: transparent;
+    }
+
+    .dragging {
+        /* no-op, reserved for plugin */
+    }
+
+    .tableContainer {
+        min-width: 550px;
+    }
+
+</style>
+<div class="card shadow border-0 mt-4 tableContainer">
+    <div class="card-header bg-secondary bg-gradient ml-0 py-3 d-flex justify-content-between">
+        <h1 class="text-white" style="white-space: nowrap;">Device List</h1>
+        @if (isLogged && canAddDevices)
+        {
+            <a asp-controller="Devices" asp-action="Insert" class="btn btn-success">+</a>
+        }
+    </div>
+    <div class="card-body p-4">
+        <table id="tblData" class="table table-bordered table-striped pt-3" style="width:100%">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    @if (isUberAdmin)
+                    {
+                        <th>OrganizationId</th>
+                    }
+                    <th>Label</th>
+                    @if (ViewBag.DeviceGridColumns != null && ViewBag.DeviceGridColumns.Count > 0)
+                    {
+                        foreach (MainGridColumnDto mgc in ViewBag.DeviceGridColumns)
+                        {
+                            <th>@mgc.Label</th>
+                        }
+                    }
+                    <th>Tags</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<!-- Bootstrap Modal for delete -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this item?
+            </div>
+            <div class="modal-footer">
+                <form method="get" id="deleteForm" action="/Devices/Delete">
+                    <input type="hidden" name="id" id="deleteId" />
+                    <button type="submit" class="btn btn-primary">OK</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <!-- colResizable plugin (adds user column resize handles) -->
+    <script src="https://cdn.jsdelivr.net/gh/alvaro-prieto/colResizable/colResizable-1.6.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            const params = new URLSearchParams(window.location.search);
+            const status = params.get("status") || "new";
+            LoadDataTable(status);
+        });
+
+        // helper to (re)apply column resizing
+        function applyColumnResizing() {
+            try {
+                // if already initialized, disable first to avoid duplicate handles
+                if ($('#tblData').data('colResizable')) {
+                    $('#tblData').colResizable({ disable: true });
+                }
+            } catch (e) {
+                // ignore if plugin not initialized yet
+            }
+
+            // initialize colResizable
+            try {
+                $('#tblData').colResizable({
+                    liveDrag: true,
+                    minWidth: 30,
+                    gripInnerHtml: "<div class='grip'></div>",
+                    draggingClass: "dragging",
+                    partialRefresh: true
+                });
+            } catch (e) {
+                console.warn("colResizable init failed:", e);
+            }
+        }
+
+        function LoadDataTable(status) {
+            dataTable = $('#tblData').DataTable({
+                processing: true,
+                serverSide: true,
+                autoWidth: false,
+                ajax: {
+                    url: "/Devices/GetAll",
+                    type: 'POST',
+                    data: function (d) {
+                        d.statusFilter = status;
+                        return d;
+                    }
+                },
+                columns: [
+                    // {
+                    //     data: 'ImgUrl',
+                    //     render: function (data) {
+                    //         return `<img src="${data}" class="card-img-top">`;
+                    //     },
+                    //     width: "2%"
+                    // },
+                    { data: 'Id', width: '55px' },
+                    @if (isUberAdmin)
+                    {
+                        <text>
+                            { data: 'OrganizationId', width: '2%' },
+                        </text>
+                    }
+                    { data: 'Label', width: '155px' },
+                    @if (ViewBag.DeviceGridColumns != null && ViewBag.DeviceGridColumns.Count > 0)
+                    {
+                        foreach (MainGridColumnDto mgc in ViewBag.DeviceGridColumns)
+                        {
+                            <text>
+                            {
+                                data: null,
+                                render: (data, type, row, meta) => {
+                                    const obj = JSON.parse(data.DeviceDataJson);
+                                    return obj?.["@mgc.Name"] ?? "";
+                                }
+                            },
+                            </text>
+                        }
+                    }
+                    {
+                        data: 'Tags',
+                        render: function (data) {
+                            return data.join(", ");
+                        },
+                        width: '100px'
+                    },
+                    {
+                        data: null,
+                        render: function (data, type, row, meta) {
+                            const openDiv = `<div class="w-75 btn-group" role="group">`;
+                            const closeDiv = `</div>`;
+                            const succC = `btn-success`;
+                            const dangC = `btn-danger`;
+                            const editUrl = `/Devices/Update?id=${data.Id}`;
+                            const editInner = `<i class="bi bi-pencil"></i>`;
+                            const delUrl = `#`;
+                            const delInner = `<i class="bi bi-trash"></i>`;
+                            const delRC = dangC + ` delete-button`;
+                            const delRA = `data-item-id="${data.Id}"`;
+
+                            return openDiv +
+                                CreateButton(editUrl, editInner, true, false, succC, null) +
+                                CreateButton(delUrl, delInner, false, true, delRC, delRA) +
+                                closeDiv;
+                        },
+                        width: '120px'
+                    }
+                ],
+                initComplete: function (settings, json) {
+                    applyColumnResizing();
+                },
+                drawCallback: function (settings) {
+                    applyColumnResizing();
+                }
+            });
+            
+            $('#tblData').on('click', '.delete-button', function (event) {
+                event.preventDefault(); // Prevent the default action of the link
+                var itemId = $(this).data('item-id');
+                $('#deleteId').val(itemId);
+                $('#confirmDeleteModal').modal('show'); // Manually show the modal
+            });
+        }
+        function CreateButton(url, inner, roundedStart, roundedEnd, restClasses, restArguments){
+            let ret = `<a href="`;
+            ret += url;
+            ret += `" class="btn mx-0 px-2`;
+            if (roundedStart) ret += ` rounded-start-5`;
+            if (roundedEnd) ret += ` rounded-end-5`;
+            if (restClasses) ret += ` ` + restClasses;
+            ret += `"`;
+            if (restArguments) ret += ` `+ restArguments;
+            ret += `>`
+            ret += inner;
+            ret += `</a>`;
+            return ret;
+        }
+    </script>
+}

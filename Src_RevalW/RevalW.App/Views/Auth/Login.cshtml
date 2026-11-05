@@ -1,0 +1,48 @@
+﻿@using RevalW.App.Model
+@using RevalW.Shared.Model
+@model LoginRequestDto
+
+<form method="post">
+    <div class="container border p-4">
+        <div class="row text-center">
+            <h1>Login</h1>
+        </div>
+        <div class="row">
+            <div class="col-12 col-6 pb-2">
+                <input asp-for="Email" class="form-control" placeholder="username.." />
+                <span asp-validation-for="Email" class="text-danger"/>
+            </div>
+            <div class="col-12 col-6 pb-2">
+                <input asp-for="Password" class="form-control" placeholder="password.." type="password" id="PasswordInput" />
+                <span asp-validation-for="Password" class="text-danger" />
+            </div>
+            <div class="col-12 col-6 pb-2">
+                <label>
+                    <input type="checkbox" id="ShowPasswordCheckbox" />
+                    show password
+                </label>
+            </div>
+            <div class="col-12 col-6 pb-2">
+                <button type="submit" class="form-control btn btn-success" value="Submit">Login</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const passwordInput = document.getElementById("PasswordInput");
+            const toggle = document.getElementById("ShowPasswordCheckbox");
+
+            toggle.addEventListener("change", function () {
+                if (this.checked) {
+                    passwordInput.type = "text";
+                } else {
+                    passwordInput.type = "password";
+                }
+            });
+        });
+    </script>
+}

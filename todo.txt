@@ -1,0 +1,11 @@
+ok - starting properties -> default value -> not working
+WebAppBuilderExt to shared
+ok - config-tag mandatory
+ok - item-tag mandatory
+add 2 types of user: "Instrument Owner" / "Calibration Technician / Metrologist"
+"Instrument Owner" will see the "Calibration Technician / Metrologist", he can make the order to some "Calibration Technician / Metrologist"
+the "Calibration Technician / Metrologist" can make order item to some device that the "Instrument Owner" have
+when he will finish it, the pdfs will be available to the "Instrument Owner" the results will be available for the etalon corrections and uncertainities if the device is the standard in later measures
+ok - in organization management show only users that belongs to this organization. uber see everyone, bur this is inside upper ribbon
+customer have device->put it to someone to calibration->device is duplicated and transformed to worker device so he can use it (worker device have id to customer device, so it can be matched whed item is finished AND item is recalibrated in 2 years)
+?? untie-loop the services (item service uses lot of other servicec. erase the connection and let the web-app decide what to do wit which service. the maui app will use the web-app)

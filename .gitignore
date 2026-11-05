@@ -1,7 +1,4 @@
-﻿################################################################################
-# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
-################################################################################
-
+﻿
 /Src_RevalW/RevalW.App/bin
 /Src_RevalW/RevalW.App/obj
 /Src_RevalW/RevalW.Gateway/bin

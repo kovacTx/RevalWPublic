@@ -1,0 +1,248 @@
+﻿@using Microsoft.AspNetCore.Html
+@using System.Text
+@using RevalW.Shared.Model
+@using System.Text.Json
+@model InnerDeviceUpsertDto
+@{
+    if (Model?.Id > 0)
+    {
+        ViewData["Title"] = "Update Device";
+    }
+    else
+    {
+        ViewData["Title"] = "Create Device";
+    }
+    var tags = ViewBag.AvailableTags as IEnumerable<TagDto> ?? [];
+    var deviceValues = ViewBag.DeviceValues as Dictionary<string, string>;
+    var configsDynamicPropertiesDefinitions = ViewBag.ConfigsDynamicPropertiesDefinitions as List<DynamicProperties4Tag>;
+}
+<div class="container border p-4" >
+    <form asp-action="Upsert" method="post" id="UpsertForm">
+        <div class="row">
+            <div class="row text-center p-3">
+                @if (Model?.Id > 0)
+                {
+                    <h1>Update Device</h1>
+                }
+                else
+                {
+                    <h1>Create Device</h1>
+                }
+                <input asp-for="Id" hidden />
+            </div>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="border form-group my-2 p-2">
+                <label asp-for="Label" class="control-label"></label>
+                <input asp-for="Label" class="form-control" />
+                <span asp-validation-for="Label" class="text-danger"></span>
+            </div>
+            <div class="border form-group my-2 p-2">
+                <h6>Tags</h6>
+                <div id="TagsContainer" class="d-flex flex-row flex-wrap gap-2 align-items-start">
+                </div>
+                <div class="d-flex align-items-center gap-2 input-row">
+                    <select class="form-select mt-2" id="Tag">
+                        <option value="" selected disabled>-- Select tag --</option>
+                        @foreach (var tag in tags)
+                        {
+                            <option value="@tag.Name" data-id="@tag.Id">@tag.Name</option>
+                        }
+                    </select>
+                </div>
+                <button type="button" id="AddTagBtn" class="btn btn-primary mt-2 col-2">+</button>
+                <input type="hidden" asp-for="TagsJson" />
+                <span id="Tags-error" class="text-danger"></span>
+            </div>
+
+            <div class="border form-group my-2 p-2">
+                <h6>Owner Email</h6>
+                <div id="OwnerEmailsContainer" class="d-flex flex-row flex-wrap gap-2 align-items-start">
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <input type="text" class="form-control flex-grow-1 mt-2" id="OwnerEmail"
+                           placeholder="Enter Owner Email..." />
+                </div>
+                <button type="button" id="AddOwnerEmailsBtn" class="btn btn-primary mt-2 col-2">+</button>
+                <input type="hidden" asp-for="OwnerEmailsJson" />
+                <span id="Email-error" class="text-danger"></span>
+            </div>
+
+            <input type="hidden" id="ConfigPropertiesJson" asp-for="ConfigDataJson" />
+            <input type="hidden" id="NewDevicePropertiesJson" asp-for="DeviceDataJson" />
+        </div>
+    </form>
+    @if (ViewBag.NewDeviceProperties != null && ViewBag.NewDeviceProperties.Count > 0)
+    {
+        <div class="row">
+            <div class="border form-group my-2 p-2" id="NewDevicePropertiesHolder">
+                <h6>Properties</h6>
+                @foreach (DynamicPropertyDto dp in ViewBag.NewDeviceProperties)
+                {
+                    <div class="form-group">
+                        <label class="control-label" for="@dp.Name">@dp.Label</label>
+                        @if (dp.InputType == "comboBox")
+                        {
+                            <select class="form-control dynamic-property" data-property-name="@dp.Name" data-property-label="@dp.Label"
+                                    @(dp.Required ? "required" : null) @(dp.Readonly ? "readonly" : null)>
+                                <option value="" selected disabled>-- Select --</option>
+                                @foreach (var option in dp.ComboOptions?.Split(",") ?? ["none options provided"])
+                                {
+                                    var selected = deviceValues != null && deviceValues.ContainsKey(dp.Name)
+                                    ? deviceValues[dp.Name] == option
+                                        : option == dp.Default;
+                                    <option value="@option" selected="@selected">@option</option>
+                                }
+                            </select>
+                        }
+                        else
+                        {
+                            <input class="form-control dynamic-property" data-property-name="@dp.Name" data-property-label="@dp.Label"
+                                    type="@dp.InputType" max="@dp.Max" min="@dp.Min" step="@dp.Step"
+                                    value="@(deviceValues is not null && deviceValues.ContainsKey(dp.Name) ? deviceValues[dp.Name] : dp.Default)"
+                                    required=@(dp.Required) readonly=@(dp.Readonly) />
+                            
+                        }
+                        <span id="@($"{dp.Name}-error")" class="text-danger"></span>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- properties area populated when a tag is committed -->
+    <div class="row">
+        <div id="ConfigPropertiesHolder" class="border form-group my-2 p-2" style="display:none;">
+            <h6>Tag Properties</h6>
+            <div id="ConfigPropertiesContainer"></div>
+            <input type="hidden" id="ConfigDynamicProperties" value="@JsonSerializer.Serialize(configsDynamicPropertiesDefinitions)" />
+        </div>
+    </div>
+
+</div>
+<div class="card-footer row mx-0">
+    <div class="col-6 col-md-3">
+        <a asp-action="DeviceIndex" class="btn btn-primary form-control ">Back to List</a>
+    </div>
+    <div class="col-6 col-md-3 offset-md-6">
+        @if (Model?.Id > 0)
+        {
+            <input type="button" value="Update" class="btn btn-success form-control" id="SubmitButton" />
+        }
+        else
+        {
+            <input type="button" value="Create" class="btn btn-success form-control" id="SubmitButton" />
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script src="~/js/valueInserter.js"></script>
+    <script src="~/js/dynamicPropertiesApplier.js"></script>
+    <script src="~/js/configTagDynamicPropsViewer.js"></script>
+
+    <script>
+        const tagInserter = new ValueInserter();
+        const emailInserter = new ValueInserter();
+        const orgPropertyApplier = new DynamicPropertiesApplier();
+        const configsPropertyApplier = new DynamicPropertiesApplier();
+        const configTagDynamicPropsViewer = new ConfigTagDynamicPropsViewer();
+
+        document.addEventListener('DOMContentLoaded', function () {
+            tagInserter.clearValueFunc = () => $('#Tag').val('');
+            tagInserter.isEmpty = (value) => !value.Id;
+            tagInserter.compareTo = (value1, value2) => value1.Name == value2.Name || value1.Id == value2.Id;
+            tagInserter.buttonLabelGetterFunc = (value) => value.Name;
+            tagInserter.$valuesJsonHolder = $('#TagsJson');
+            tagInserter.$valueElementsContainer = $('#TagsContainer');
+            tagInserter.createNewValueElementFunc = (value) => tagInserter.createRemovableNewValueElement(value);
+            tagInserter.onRemoveValueFunc = configTagDynamicPropsViewer.onTagRemove.bind(configTagDynamicPropsViewer);
+            tagInserter.init();
+
+            emailInserter.clearValueFunc = () => $('#OwnerEmail').val('');
+            emailInserter.isEmpty = (value) => !value;
+            emailInserter.compareTo = (value1, value2) => value1 == value2;
+            emailInserter.buttonLabelGetterFunc = (value) => value;
+            emailInserter.$valuesJsonHolder = $('#OwnerEmailsJson');
+            emailInserter.$valueElementsContainer = $('#OwnerEmailsContainer');
+            emailInserter.createNewValueElementFunc = (value) => emailInserter.createRemovableNewValueElement(value);
+            emailInserter.init();
+
+            configTagDynamicPropsViewer.ajaxAddress = '/items/GetDynamicProps4Config';
+            configTagDynamicPropsViewer.$propertiesWrapper = $('#ConfigPropertiesHolder');
+            configTagDynamicPropsViewer.$propertiesGroupsContainer = $('#ConfigPropertiesContainer');
+            configTagDynamicPropsViewer.$propertiesDefinition = $('#ConfigDynamicProperties');
+            configTagDynamicPropsViewer.$initValues = $('#ConfigPropertiesJson');
+            configTagDynamicPropsViewer.init();
+
+            orgPropertyApplier.$appliedProperties = $('#NewDevicePropertiesJson');
+            orgPropertyApplier.$propertiesHolder = $('#NewDevicePropertiesHolder');
+
+            configsPropertyApplier.$appliedProperties = $('#ConfigPropertiesJson');
+            configsPropertyApplier.$propertiesHolder = $('#ConfigPropertiesHolder');
+
+            $('#AddOwnerEmailsBtn').on('click', addEmail);
+            $('#SubmitButton').on('click', function () {
+                $('#UpsertForm').submit();
+            });
+            $('#UpsertForm').on('submit', onFormSubmit);
+            $('#UpsertForm').on('submit', addEmail);
+            $('#AddTagBtn').on('click', addTag);
+        });
+        function addEmail() {
+            $('#Email-error').text('');
+            const email = $('#OwnerEmail').val();
+            if (!email) return;
+            if (!isValidEmail(email)) {
+                $('#Email-error').text('email is not valid?');
+                return;
+            }
+            emailInserter.addValue(email);
+        }
+        function isValidEmail(email) {
+            return /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/.test(email);
+        }
+        async function addTag() {
+            // Determine selected option and its data-id
+            const $selected = $('#Tag option:selected');
+            const dataId = $selected.data('id');
+            const tagName = $selected.text() || $('#Tag').val();
+            await configTagDynamicPropsViewer.addTag(dataId, tagName);
+
+            tagInserter.addValue({
+                Id: dataId,
+                Name: tagName
+            });
+        }
+        async function onFormSubmit(event) {
+            event.preventDefault();
+            await addTag();
+
+            $('#Tags-error').text('');
+            let tags = '';
+            if ($('#TagsJson').val()) tags = JSON.parse($('#TagsJson').val());
+            if (!tags || tags.length === 0) {
+                $('#Tags-error').text('no tags?');
+                event.preventDefault();
+            }
+
+            const myEvent = createFakeEvent();
+
+            orgPropertyApplier.applyDynamicProperties(myEvent);
+            configsPropertyApplier.applyDynamicProperties(myEvent);
+
+            if (!myEvent.defaultPrevented) {
+                // Manually submit the form only if approved
+                event.target.submit();
+            }
+        }
+        function createFakeEvent() {
+            let prevented = false;
+            return {
+                preventDefault() { prevented = true; },
+                get defaultPrevented() { return prevented; }
+            };
+        }
+
+    </script>
+}

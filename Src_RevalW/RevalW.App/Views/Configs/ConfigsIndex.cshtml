@@ -1,0 +1,151 @@
+﻿@using RevalW.Shared.Model;
+@using RevalW.Shared.Utils;
+@using RevalW.Services.Shared.Utils;
+@{
+    var isLogged = User?.Identity?.IsAuthenticated == true;
+    var canAddConfigs = User?.IsAuthorized(RightsList.Config_Create) ?? true;
+    var isCreator = isLogged && User?.IsInRole(ERoles.Creator) == true;
+    var isUberAdmin = isLogged && User?.IsInRole(ERoles.UberAdmin) == true;
+
+}
+@section Meta {
+    <meta name="description" content="Create and manage the configurations of the dynamic forms of the RevalW Agenda." />
+    <meta property="og:title" content="Configuration Management | RevalW Agenda" />
+}
+@model IEnumerable<ConfigHeaderDto>
+<style>
+
+    /* Resizable table styling */
+    #tblData {
+        table-layout: fixed; /* recommended for column resize plugins */
+        width: 100% !important;
+    }
+    #tblData th, #tblData td {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+    #tblData .grip {
+        width: 8px;
+        height: 100%;
+        background: transparent;
+    }
+    .dragging {
+        /* no-op, reserved for plugin */
+    }
+
+</style>
+<div class="card shadow border-0 mt-4">
+    <div class="card-header bg-secondary bg-gradient ml-0 py-3">
+        <div class="d-flex align-items-center">
+            <h1 class="text-white" style="white-space: nowrap;">Config List</h1>
+            @if (canAddConfigs)
+            {
+                <a asp-controller="Configs" asp-action="Insert" class="btn btn-success ms-auto">+</a>
+            }
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <table id="tblData" class="table table-bordered table-striped pt-3" style="width:100%">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    @if (isUberAdmin)
+                    {
+                        <th>OrganizationId</th>
+                    }
+                    <th>Designation</th>
+                    <th>Version</th>
+                    <th>Author</th>
+                    <th>Tag</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- colResizable plugin (adds user column resize handles) -->
+    <script src="https://cdn.jsdelivr.net/gh/alvaro-prieto/colResizable/colResizable-1.6.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            dataTable = $('#tblData').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "/Configs/GetAll",
+                    type: 'POST'
+                },
+                columns: [
+                    { data: 'Id', width: '60px' },
+                    @if (isUberAdmin)
+                    {
+                        <text>
+                            { data: 'OrganizationId', width: '55px' },
+                        </text>
+                    }
+                    { data: 'Designation' },
+                    { data: 'Version' },
+                    { data: 'Author' },
+                    {
+                        data: 'Tags',
+                        render: function (data) {
+                            return data.join(', ');
+                        },
+                        width: '150px' },
+                    {
+                        data: 'Id',
+                        render: function (data) {
+                            return `<div class="w-75 btn-group" role="group">
+                                <a href="/Configs/Update?id=${data}" class="btn btn-primary btn-success mx-1 rounded-start-5 rounded-end-0">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="/Configs/Delete?id=${data}" class="btn btn-primary btn-danger mx-1 rounded-start-0 rounded-end-5">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>`;
+                        },
+                        width: '120px'
+                    }
+                ],
+                initComplete: function (settings, json) {
+                    applyColumnResizing();
+                },
+                drawCallback: function (settings) {
+                    applyColumnResizing();
+                }
+            });
+            $('#tblData').on('xhr.dt', function (e, settings, json, xhr) {
+                console.log('DataTables AJAX response (xhr.dt):', json);
+            });
+        });
+
+        // helper to (re)apply column resizing
+        function applyColumnResizing() {
+            try {
+                // if already initialized, disable first to avoid duplicate handles
+                if ($('#tblData').data('colResizable')) {
+                    $('#tblData').colResizable({ disable: true });
+                }
+            } catch (e) {
+                // ignore if plugin not initialized yet
+            }
+
+            // initialize colResizable
+            try {
+                $('#tblData').colResizable({
+                    liveDrag: true,
+                    minWidth: 30,
+                    gripInnerHtml: "<div class='grip'></div>",
+                    draggingClass: "dragging",
+                    partialRefresh: true
+                });
+            } catch (e) {
+                console.warn("colResizable init failed:", e);
+            }
+        }
+
+    </script>
+}

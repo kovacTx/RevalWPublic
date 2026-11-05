@@ -1,0 +1,331 @@
+﻿@using Microsoft.AspNetCore.Html
+@using System.Text
+@using RevalW.App.Model
+@using RevalW.Shared.Model
+@using System.Text.Json
+@model InnerItemUpsertDto
+@{
+    if (Model?.Id > 0)
+    {
+        ViewData["Title"] = "Update Item";
+    }
+    else
+    {
+        ViewData["Title"] = "Create Item";
+    }
+    var itemValues = ViewBag.ItemValues as Dictionary<string, string>;
+    var configsDynamicPropertiesDefinitions = ViewBag.ConfigsDynamicPropertiesDefinitions as List<DynamicProperties4Tag>;
+}
+<fieldset @(ViewBag.IsDisabled ? "disabled" : "")>
+    <div class="container border p-4" >
+        <form asp-action="Upsert" method="post" id="UpsertForm">
+            <input type="hidden" name="mode" id="modeField" />
+            <div class="row">
+                <div class="position-relative p-3">
+                    @if (Model?.Id > 0)
+                    {
+                        <h1 class="text-center mb-0">Update Item</h1>
+                    }
+                    else
+                    {
+                        <h1 class="text-center mb-0">Create Item</h1>
+                    }
+                    <div class="position-absolute top-50 end-0 translate-middle-y me-3">
+                        <button id="finishBtn" type="button" class="btn btn-info rounded-start-5 rounded-end-5 px-4">&gt;</button>
+                    </div>
+                    <input asp-for="Id" hidden />
+                </div>
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                @if (Model?.Id > 0)
+                {
+                    <div class="form-group">
+                        <label asp-for="Status" class="control-label"></label>
+                        <input asp-for="Status" class="form-control" disabled />
+                    </div>
+                }
+
+                <div class="border form-group my-2 p-2">
+                    <h6>Device</h6>
+                    @if (string.IsNullOrEmpty(Model?.Device?.Label))
+                    {
+                        <button type="button" id="ShowDevicesBtn" class="btn btn-primary">Pick device</button>
+                    }
+                    else
+                    {
+                        <button type="button" id="ShowDevicesBtn" class="btn btn-primary">@Model.Device.Id - @Model.Device.Label</button>
+                    }
+                    <span id="Device-error" class="text-danger"></span>
+                    <input asp-for="DeviceId" type="hidden" id="DeviceId" />
+                </div>
+
+                <div class="border form-group my-2 p-2">
+                    <h6>Tags</h6>
+                    <div id="TagsContainer" class="d-flex flex-row flex-wrap gap-2 align-items-start">
+                    </div>
+                    <div class="d-flex align-items-center gap-2 input-row">
+                        <select class="form-select mt-2" id="Tag">
+                            <option value="" selected disabled>-- Pick a device first --</option>
+                        </select>
+                    </div>
+                    <button type="button" id="AddTagBtn" class="btn btn-primary mt-2 col-2">+</button>
+                    <input type="hidden" asp-for="TagsJson" />
+                    <span id="Tags-error" class="text-danger"></span>
+                </div>
+
+                <input type="hidden" asp-for="Status" />
+                <input type="hidden" id="NewItemPropertiesJson" asp-for="ItemDataJson" />
+                <input type="hidden" id="NewItemConfigPropertiesJson" asp-for="ConfigDataJson" />
+            </div>
+        </form>
+        @if (ViewBag.NewItemProperties != null && ViewBag.NewItemProperties.Count > 0)
+        {
+            <div class="row">
+                <div class="border form-group my-2 p-2" id="NewItemPropertiesHolder">
+                    <h6>Properties</h6>
+                    @foreach (DynamicPropertyDto dp in ViewBag.NewItemProperties)
+                    {
+                        <div class="form-group">
+                            <label class="control-label" for="@dp.Name">@dp.Label</label>
+                            @if (dp.InputType == "comboBox")
+                            {
+                                <select class="form-control dynamic-property" data-property-name="@dp.Name" data-property-label="@dp.Label"
+                                        @(dp.Required ? "required" : null) @(dp.Readonly ? "readonly" : null)>
+                                    <option value="" selected disabled>-- Select --</option>
+                                    @foreach (var option in dp.ComboOptions?.Split(",") ?? ["none options provided"])
+                                    {
+                                        var selected = itemValues != null && itemValues.ContainsKey(dp.Name)
+                                        ? itemValues[dp.Name] == option
+                                            : option == dp.Default;
+                                        <option value="@option" selected="@selected">@option</option>
+                                    }
+                                </select>
+                            }
+                            else
+                            {
+                                <input class="form-control dynamic-property" data-property-name="@dp.Name" data-property-label="@dp.Label"
+                                       type="@dp.InputType" max="@dp.Max" min="@dp.Min" step="@dp.Step"
+                                       value="@(itemValues is not null && itemValues.ContainsKey(dp.Name) ? itemValues[dp.Name] : dp.Default)"
+                                       required=@(dp.Required) readonly=@(dp.Readonly) />
+                            
+                            }
+                            <span id="@($"{dp.Name}-error")" class="text-danger"></span>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        <!-- properties area populated when a tag is committed -->
+        <div class="row">
+            <div id="NewItemConfigPropertiesHolder" class="border form-group my-2 p-2" style="display:none;">
+                <h6>Tag Properties</h6>
+                <div id="ConfigPropertiesContainer"></div>
+                <input type="hidden" id="ConfigDynamicProperties" value="@JsonSerializer.Serialize(configsDynamicPropertiesDefinitions)" />
+                <input type="hidden" id="DeviceConfigBaseData" />
+            </div>
+        </div>
+
+        @if (Model?.Id > 0)
+        {
+            <div class="row">
+                <div class="border my-2 p-2">
+                    <div>created by: @ViewBag.UserIdCreated</div>
+                    <div>exported by: @ViewBag.UserIdExported</div>
+                    <div>imported by: @ViewBag.UserIdImported</div>
+                    <div>finished by: @ViewBag.UserIdFinalized</div>
+                    <div>deleted by: @ViewBag.UserIdDeleted</div>
+                    <div>undeleted by: @ViewBag.UserIdUndeleted</div>
+                    <div>marked as readonly by: @ViewBag.UserIdReadonlied</div>
+                    <div>used config id: @ViewBag.UsedConfigId</div>
+
+                    <label asp-for="AppDataJson" class="control-label">Application Data</label>
+                    <textarea asp-for="AppDataJson" class="form-control w-100 no-wrap font-monospace" rows="5" readonly></textarea>
+                </div>
+            </div>
+        }
+    </div>
+</fieldset>
+<div class="card-footer row mx-0">
+    <div class="col-6 col-md-3">
+        <a asp-action="ItemIndex" class="btn btn-primary form-control ">Back to List</a>
+    </div>
+    @if (ViewBag.IsDisabled != null && !ViewBag.IsDisabled)
+    {
+        <div class="col-6 col-md-3 offset-md-6">
+            @if (Model?.Id > 0)
+            {
+                <input type="button" value="Update" class="btn btn-success form-control" id="SubmitButton" />
+            }
+            else
+            {
+                <input type="button" value="Create" class="btn btn-success form-control" id="SubmitButton" />
+            }
+        </div>
+    }
+    
+</div>
+
+@await Html.PartialAsync("_DevicesPickerModal")
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script src="~/js/valueInserter.js"></script>
+    <script src="~/js/dynamicPropertiesApplier.js"></script>
+    <script src="~/js/configTagDynamicPropsViewer.js"></script>
+
+    <script>
+        const tagInserter = new ValueInserter();
+        const orgPropertyApplier = new DynamicPropertiesApplier();
+        const configsPropertyApplier = new DynamicPropertiesApplier();
+        const configTagDynamicPropsViewer = new ConfigTagDynamicPropsViewer();
+
+        document.addEventListener("DOMContentLoaded", async function () {
+            tagInserter.clearValueFunc = () => $('#Tag').val('');
+            tagInserter.isEmpty = (value) => !value.Id;
+            tagInserter.compareTo = (value1, value2) => value1.Name == value2.Name || value1.Id == value2.Id;
+            tagInserter.buttonLabelGetterFunc = (value) => value.Name;
+            tagInserter.$valuesJsonHolder = $('#TagsJson');
+            tagInserter.$valueElementsContainer = $('#TagsContainer');
+            tagInserter.createNewValueElementFunc = (value) => tagInserter.createRemovableNewValueElement(value);
+            tagInserter.onRemoveValueFunc = configTagDynamicPropsViewer.onTagRemove.bind(configTagDynamicPropsViewer);
+            tagInserter.init();
+
+            await devicePicked(false);
+
+            configTagDynamicPropsViewer.ajaxAddress = '/items/GetDynamicProps4Config';
+            configTagDynamicPropsViewer.readonly = true;
+            configTagDynamicPropsViewer.$propertiesWrapper = $('#NewItemConfigPropertiesHolder');
+            configTagDynamicPropsViewer.$propertiesGroupsContainer = $('#ConfigPropertiesContainer');
+            configTagDynamicPropsViewer.$propertiesDefinition = $('#ConfigDynamicProperties');
+            configTagDynamicPropsViewer.$initValues = $('#NewItemConfigPropertiesJson');
+            configTagDynamicPropsViewer.$baseValues = $('#DeviceConfigBaseData');
+            configTagDynamicPropsViewer.init();
+
+            orgPropertyApplier.$appliedProperties = $('#NewItemPropertiesJson');
+            orgPropertyApplier.$propertiesHolder = $('#NewItemPropertiesHolder');
+
+            configsPropertyApplier.$appliedProperties = $('#NewItemConfigPropertiesJson');
+            configsPropertyApplier.$propertiesHolder = $('#NewItemConfigPropertiesHolder');
+
+            $('#SubmitButton').on('click', function () {
+                $('#modeField').val('upsert');
+                $('#UpsertForm').submit();
+            });
+            $('#finishBtn').on('click', function () {
+                $('#modeField').val('finish');
+                $('#UpsertForm').submit();
+            });
+            $('#UpsertForm').on('submit', onFormSubmit);
+
+            // Devices picker button handler
+            $('#ShowDevicesBtn').on('click', devicePickerShow);
+
+            // handle select-device click inside the picker
+            $(document).on('click', '.select-device-button', devicePicked);
+
+            $('#AddTagBtn').on('click', addTag);
+        });
+        async function addTag() {
+            // Determine selected option and its data-id
+            const $selected = $('#Tag option:selected');
+            const dataId = $selected.data('id');
+            const tagName = $selected.text() || $('#Tag').val();
+             
+            const tagAdded =  tagInserter.addValue({
+                Id: dataId,
+                Name: tagName
+            });
+            if (tagAdded) await configTagDynamicPropsViewer.addTag(dataId, tagName);
+        }
+        async function onFormSubmit(event) {
+            event.preventDefault();
+            const myEvent = createFakeEvent();
+            $('#Device-error').text('');
+            if (!$('#DeviceId').val()) {
+                $('#Device-error').text('no device?');
+                myEvent.preventDefault();
+            }
+            await addTag();
+            $('#Tags-error').text('');
+            let tags = '';
+            if ($('#TagsJson').val()) tags = JSON.parse($('#TagsJson').val());
+            if (!tags || tags.length === 0) {
+                $('#Tags-error').text('no tags?');
+                myEvent.preventDefault();
+            }
+             
+            orgPropertyApplier.applyDynamicProperties(myEvent);
+            configsPropertyApplier.applyDynamicProperties(myEvent);
+
+            if (!myEvent.defaultPrevented) {
+                // Manually submit the form only if approved
+                event.target.submit();
+            }
+        }
+        async function devicePicked(clearOld) { // this method is used inside _DevicesPickerModalScripts also
+            if (clearOld) {
+                $('#DeviceConfigBaseData').val('');
+                $('#NewItemPropertiesJson').val('');
+                $('#NewItemConfigPropertiesJson').val('');
+            }
+
+            try {
+                const configDataNtags = await new Promise((resolve, reject) => {
+                    $.getJSON('/devices/GetConfigDataNTags', { id: $('#DeviceId').val() })
+                        .done(resolve)
+                        .fail(function (xhr, status, err) {
+                            console.error('Failed to load device config data:', status, err);
+                        });
+                });
+
+                if (clearOld) {
+                    // clean all tags
+                    tagInserter.clear();
+                    configTagDynamicPropsViewer.clear();
+                }
+
+                deviceDataFetched(configDataNtags);
+            } catch (err) {
+                console.error('Error in loading new item properties:', err);
+            }
+        }
+        function deviceDataFetched(data) {
+            if (!data) return;
+
+            $('#DeviceConfigBaseData').val(data.configData);
+
+            // build select options for #Tag using data.tags
+            const tags = Array.isArray(data.tags) ? data.tags : [];
+            const $select = $('#Tag');
+
+            let html = '<option value="" selected disabled>-- Select tag --</option>';
+            tags.forEach(t => {
+                const name = t.Name ?? t.name ?? t.value ?? '';
+                const id = t.Id ?? t.id ?? '';
+               
+                if (name) {
+                    const dataIdAttr = id ? `data-id="${escapeHtml(id)}"` : '';
+                    html += `<option value="${escapeHtml(name)}" ${dataIdAttr}>${escapeHtml(name)}</option>`;
+                }
+            });
+
+            $select
+                .attr('class', 'form-select mt-2 valid')
+                .attr('aria-invalid', 'false')
+                .html(html);
+        }
+        function escapeHtml(str) {
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+        function createFakeEvent() {
+            let prevented = false;
+            return {
+                preventDefault() { prevented = true; },
+                get defaultPrevented() { return prevented; }
+            };
+        }
+
+    </script>
+
+    @await Html.PartialAsync("_DevicesPickerModalScripts")
+}
