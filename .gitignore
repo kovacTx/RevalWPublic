@@ -1,0 +1,26 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/Src_RevalW/RevalW.App/bin
+/Src_RevalW/RevalW.App/obj
+/Src_RevalW/RevalW.Gateway/bin
+/Src_RevalW/RevalW.Gateway/obj
+/Src_RevalW/RevalW.MessageBus/obj
+/Src_RevalW/RevalW.MessageBus/bin
+/Src_RevalW/RevalW.Services.AuthAPI/bin
+/Src_RevalW/RevalW.Services.AuthAPI/obj
+/Src_RevalW/RevalW.Services.DevicesAPI/bin
+/Src_RevalW/RevalW.Services.DevicesAPI/obj
+/Src_RevalW/RevalW.Services.DocumentsAPI/bin
+/Src_RevalW/RevalW.Services.DocumentsAPI/obj
+/Src_RevalW/RevalW.Services.ItemsAPI/bin
+/Src_RevalW/RevalW.Services.ItemsAPI/obj
+/Src_RevalW/RevalW.Services.OrganizationAPI/bin
+/Src_RevalW/RevalW.Services.OrganizationAPI/obj
+/Src_RevalW/RevalW.Services.Shared/bin
+/Src_RevalW/RevalW.Services.Shared/obj
+/Src_RevalW/RevalW.Services.TemplatesAPI/bin
+/Src_RevalW/RevalW.Services.TemplatesAPI/obj
+/.vs
+/Src_RevalW/.vs

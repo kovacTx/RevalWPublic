@@ -33,10 +33,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RevalW.Services.Shared", "R
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RevalW.Services.DevicesAPI", "RevalW.Services.DevicesAPI\RevalW.Services.DevicesAPI.csproj", "{6502EBBE-9733-C230-55F6-780C4AEE3CBA}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{F24C349D-6FA5-4CA6-988B-6B2B71A5CC41}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemplateTest", "TemplateTest\TemplateTest.csproj", "{D6F8F9D3-1049-4450-992D-83FDA5EAF682}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,10 +79,6 @@ Global
 		{6502EBBE-9733-C230-55F6-780C4AEE3CBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6502EBBE-9733-C230-55F6-780C4AEE3CBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6502EBBE-9733-C230-55F6-780C4AEE3CBA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D6F8F9D3-1049-4450-992D-83FDA5EAF682}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D6F8F9D3-1049-4450-992D-83FDA5EAF682}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D6F8F9D3-1049-4450-992D-83FDA5EAF682}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D6F8F9D3-1049-4450-992D-83FDA5EAF682}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -102,7 +94,6 @@ Global
 		{61E680FE-B4FA-BCAA-5BBA-B7BACB0E5926} = {F9D4E4E7-EC5E-453E-AF2F-3D6A06640459}
 		{6A7FF8EC-2306-9FED-2A09-A788A7678A8A} = {C8C3C401-7496-4D32-8C4E-B4BDB6CBB6AC}
 		{6502EBBE-9733-C230-55F6-780C4AEE3CBA} = {F9D4E4E7-EC5E-453E-AF2F-3D6A06640459}
-		{D6F8F9D3-1049-4450-992D-83FDA5EAF682} = {F24C349D-6FA5-4CA6-988B-6B2B71A5CC41}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4BBC05C7-BB4C-4F62-9B6E-AC1E98D89EF9}
