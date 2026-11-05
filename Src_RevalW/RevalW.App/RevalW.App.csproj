@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="14.0.0" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.26.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RevalW.Services.Shared\RevalW.Services.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="RevalM.SharedStorage">
+      <HintPath>..\Resources\RevalM.SharedStorage.dll</HintPath>
+    </Reference>
+    <Reference Include="RevalW.Shared">
+      <HintPath>..\Resources\RevalW.Shared.dll</HintPath>
+    </Reference>
+    <Reference Include="RevalW.Shared">
+      <HintPath>..\Resources\RevalW.Shared.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

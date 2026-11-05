@@ -1,0 +1,63 @@
+<style>
+    /* Resizable table styling */
+    #tblData {
+        table-layout: fixed; /* recommended for column resize plugins */
+        width: 100% !important;
+    }
+
+    #tblData th, #tblData td {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    #tblData .grip {
+        width: 8px;
+        height: 100%;
+        background: transparent;
+    }
+
+    .modal-90w {
+        max-width: 90% !important;
+    }
+
+    .dragging {
+        /* no-op, reserved for plugin */
+    }
+
+</style>
+
+<div class="modal fade" id="devicesPickerModal" tabindex="-1"
+     data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="devicesPickerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-90w">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="devicesPickerModalLabel">Select Device</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table id="tblData" class="table table-bordered table-striped" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            @if (User?.Identity?.IsAuthenticated == true && User?.IsInRole("UberAdmin") == true)
+                            {
+                                <th>OrganizationId</th>
+                            }
+                            <th>Label</th>
+                            @if (ViewBag.DeviceGridColumns != null && ViewBag.DeviceGridColumns.Count > 0)
+                            {
+                                foreach (var mgc in ViewBag.DeviceGridColumns)
+                                {
+                                    <th>@mgc.Label</th>
+                                }
+                            }
+                            <th>Tags</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

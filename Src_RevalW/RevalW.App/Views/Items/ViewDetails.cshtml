@@ -1,0 +1,381 @@
+﻿@using Microsoft.AspNetCore.Html
+@using System.Text
+@using RevalW.App.Controllers
+@using RevalW.App.Utils
+@using RevalW.Shared.Model
+@using RevalW.Shared.Utils
+@using System.Text.Json
+@model InnerItemUpsertDto
+@{
+    ViewData["Title"] = "View Details";
+    var tags = ViewBag.AvailableTags as IEnumerable<string> ?? [];
+    var itemValues = ViewBag.ItemValues as Dictionary<string, string>;
+    var configsDynamicPropertiesDefinitions = ViewBag.ConfigsDynamicPropertiesDefinitions as List<DynamicProperties4Tag>;
+    var generatedDocsJson = JsonSerializer.Serialize(Model.GeneratedDocuments);
+}
+<style>
+    .half-height-btn {
+        height: 1.5rem;
+        line-height: 1.5rem;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
+    #stderrDisplay {
+        max-height: 300px;
+        overflow: auto;
+        white-space: pre-wrap;
+        color: red;
+        margin-top: 10px;
+    }
+</style>
+<div class="container border p-4" >
+    <div class="position-relative p-3">
+        <h1 class="text-center mb-0">View Details</h1>
+        <div class="position-absolute top-50 end-0 translate-middle-y">
+            @switch (Model.Status)
+            {
+                default:
+                    break;
+                case EItemStatus.Exported:
+                    <a class="btn btn-info rounded-start-5 rounded-end-5 px-10" id="resetStatus-button" href="#">&lt;</a>
+                    break;
+                case EItemStatus.Imported:
+                    <a class="btn btn-info rounded-start-5 rounded-end-0 px-10" id="resetStatus-button" href="#">&lt;</a>
+                    <a id="forwardBtn" class="btn btn-info rounded-start-0 rounded-end-5 px-10" href="/Items/ForwardStateAndView">&gt;</a>
+                break;
+            }
+        </div>
+    </div>
+    <fieldset disabled>
+        <div class="row">
+            <div class="border form-group my-2 p-2">
+                <h6>Tags</h6>
+                <div id="TagsContainer" class="d-flex flex-row flex-wrap gap-2 align-items-start">
+                    @if (ViewBag.Tags != null && ViewBag.Tags.Count > 0)
+                    {
+                        for (int i = 0; i < ViewBag.Tags.Count; i++)
+                        {
+                            string tn = ViewBag.Tags[i];
+                            if (string.IsNullOrEmpty(tn)) continue;
+                            <div class="d-flex align-items-center input-row">
+                                <button type="button" class="btn btn-primary value-button rounded-start-5 rounded-end-5" data-label="@tn">
+                                    @tn
+                                </button>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </fieldset>
+    <div class="row">
+    <div class="border form-group my-2 p-2">
+        <h6>Device</h6>
+            @if (ViewBag.CanEditDevice == true)
+            {
+                <button type="button" id="ShowDevicesBtn" class="btn btn-primary">Pick device</button>
+            }
+            else
+            {
+                <h class="btn btn-primary" disabled>@Model?.Device?.Id - @Model?.Device?.Label</h>
+            }
+            <span id="Device-error" class="text-danger"></span>
+            <input asp-for="DeviceId" type="hidden" id="DeviceId" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="border form-group my-2 p-2">
+            <h6>Documents</h6>
+            <form asp-action="UploadDocuments" enctype="multipart/form-data" method="post" id="documentsUploadForm">
+                <div id="DocumentsContainer" class="d-flex flex-row flex-wrap gap-2 align-items-start">
+                    @if (ViewBag.DebugFiles != null && ViewBag.DebugFiles.Count > 0)
+                    {
+                        <div class="d-flex flex-column align-items-end ms-auto">
+                            @foreach (DebugFile debugFile in ViewBag.DebugFiles)
+                            {
+                                <button type="button" class="btn btn-primary value-button rounded-start-5 rounded-end-5 mb-1 half-height-btn debugFileBtn"
+                                        data-uri="@debugFile.Path">
+                                    @debugFile.Name
+                                </button>
+                            }
+                        </div>
+                    }
+                </div>
+            </form>
+            <div id="stderrDisplay" style="color: red; margin-top: 10px;"></div>
+            <input type="hidden" id="GeneratedDocumentsJson" value="@generatedDocsJson" />
+        </div>
+    </div>
+    <fieldset disabled>
+        <div class="row">
+            @if (ViewBag.NewItemProperties != null && ViewBag.NewItemProperties.Count > 0)
+            {
+                <div class="border form-group my-2 p-2">
+                    <h6>Properties</h6>
+                    @foreach (DynamicPropertyDto dp in ViewBag.NewItemProperties)
+                    {
+                        <div class="form-group">
+                            <label class="control-label" for="@dp.Name">@dp.Label</label>
+                            @if (dp.InputType == "comboBox")
+                            {
+                                <select class="form-control dynamic-property" data-property-name="@dp.Name"
+                                        @(dp.Required ? "required" : null) @(dp.Readonly ? "readonly" : null)>
+                                    <option value="" selected disabled>-- Select --</option>
+                                    @foreach (var option in dp.ComboOptions?.Split(",") ?? new[] { "none options provided" })
+                                    {
+                                        var selected = itemValues != null && itemValues.ContainsKey(dp.Name)
+                                        ? itemValues[dp.Name] == option
+                                            : option == dp.Default;
+                                        <option value="@option" selected="@selected">@option</option>
+                                    }
+                                </select>
+                            }
+                            else
+                            {
+                                <input class="form-control dynamic-property" data-property-name="@dp.Name"
+                                        type="@dp.InputType" max="@dp.Max" min="@dp.Min" step="@dp.Step"
+                                        value="@(itemValues is not null && itemValues.ContainsKey(dp.Name) ? itemValues[dp.Name] : dp.Default)"
+                                        required=@(dp.Required) readonly=@(dp.Readonly) />
+                            
+                            }
+                        </div>
+                    }
+                </div>
+            }
+
+            <!-- properties area populated when a tag is committed -->
+            <div class="row">
+                <div id="NewItemConfigPropertiesHolder" class="border form-group my-2 p-2" style="display:none;">
+                    <h6>Tag Properties</h6>
+                    <div id="ConfigPropertiesContainer"></div>
+                    <input type="hidden" id="ConfigDynamicProperties" value="@JsonSerializer.Serialize(configsDynamicPropertiesDefinitions)" />
+                    <input type="hidden" id="DeviceConfigBaseData" />
+                    <input type="hidden" id="NewItemConfigPropertiesJson" asp-for="ConfigDataJson" />
+                </div>
+            </div>
+
+            @if (Model?.Id > 0)
+            {
+                <div class="border my-2 p-2">
+                    <div>created by: @ViewBag.UserIdCreated</div>
+                    <div>exported by: @ViewBag.UserIdExported</div>
+                    <div>imported by: @ViewBag.UserIdImported</div>
+                    <div>finished by: @ViewBag.UserIdFinalized</div>
+                    <div>deleted by: @ViewBag.UserIdDeleted</div>
+                    <div>undeleted by: @ViewBag.UserIdUndeleted</div>
+                    <div>marked as readonly by: @ViewBag.UserIdReadonlied</div>
+                    <div>used config id: @ViewBag.UsedConfigId</div>
+
+                    <label asp-for="AppDataJson" class="control-label">Application Data</label>
+                    <textarea asp-for="AppDataJson" class="form-control w-100 no-wrap font-monospace" rows="5" readonly></textarea>
+                </div>
+            }
+        </div>
+    </fieldset>
+</div>
+
+<div class="card-footer row mx-0">
+    <div class="col-6 col-md-3">
+        <a asp-action="ItemIndex" class="btn btn-primary form-control ">Back to List</a>
+    </div>
+    
+</div>
+
+<!-- Bootstrap Modal for statusReset -->
+<div class="modal fade" id="confirmStatusResetModal" tabindex="-1" aria-labelledby="confirmStatusResetModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmStatusResetModalLabel">Confirm Status reset</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to reset status of this item?
+            </div>
+            <div class="modal-footer">
+                <form method="get" id="statusResetForm" asp-controller="Items" asp-action="MarkAsNew" >
+                    <input type="hidden" name="id" asp-for="Id" />
+                    <button type="submit" class="btn btn-primary">OK</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@await Html.PartialAsync("_DevicesPickerModal")
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script src="~/js/valueInserter.js"></script>
+    <script src="~/js/configTagDynamicPropsViewer.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@8.0.0/dist/browser/signalr.min.js"></script>
+    <script src="~/js/documentRegenerator.js"></script>
+
+    <script>
+        const configTagDynamicPropsViewer = new ConfigTagDynamicPropsViewer();
+        const documentInserter = new ValueInserter();
+        const documentRegenerator = new DocumentRegenerator();
+
+        // render server-side status once into a JS boolean, then use plain client-side branching
+        const isNewItem = @(Model?.Status == EItemStatus.New ? "true" : "false");
+                
+        document.addEventListener("DOMContentLoaded", function () {
+            configTagDynamicPropsViewer.ajaxAddress = '/items/GetDynamicProps4Config';
+            configTagDynamicPropsViewer.readonly = true;
+            configTagDynamicPropsViewer.$propertiesWrapper = $('#NewItemConfigPropertiesHolder');
+            configTagDynamicPropsViewer.$propertiesGroupsContainer = $('#ConfigPropertiesContainer');
+            configTagDynamicPropsViewer.$propertiesDefinition = $('#ConfigDynamicProperties');
+            configTagDynamicPropsViewer.$initValues = $('#NewItemConfigPropertiesJson');
+            configTagDynamicPropsViewer.$baseValues = $('#DeviceConfigBaseData');
+            configTagDynamicPropsViewer.init();
+
+            documentInserter.clearValueFunc = () => $('#Tag').val('');
+            documentInserter.isEmpty = (value) => !value;
+            documentInserter.compareTo = (value1, value2) => value1 == value2;
+            documentInserter.buttonLabelGetterFunc = (value) => value.Title;
+            documentInserter.createNewValueElementFunc = creteDocumentInserterElement;
+            documentInserter.onOpenValueFunc = openDocument;
+            documentInserter.onRemoveValueFunc = removeDocument;
+            documentInserter.onRefreshValueFunc = (index, doc, btn) => documentRegenerator.regenerateDocumentAsync(btn);;
+            documentInserter.$valuesJsonHolder = $('#GeneratedDocumentsJson');
+            documentInserter.$valueElementsContainer = $('#DocumentsContainer');
+            documentInserter.init();
+
+            documentRegenerator.hubUrl = '@Url.Content("~/hubs/generation")';
+            documentRegenerator.appendProgressMessage = appendProgressMessage;
+            documentRegenerator.handleErr = handleErr;
+            documentRegenerator.handleFinish = handleFinish;
+
+            console.log($("#GeneratedDocumentsJson"))
+            console.log($("#GeneratedDocumentsJson").val())
+
+            $("#forwardBtn").on("click", function (e) {
+                e.preventDefault();
+
+                const deviceId = $("#DeviceId").val();
+                const id = @(Model?.Id ?? 0);
+
+                const baseUrl = $(this).attr("href");
+                window.location.href = baseUrl + "?id=" + id + "&deviceId=" + deviceId;
+            });
+        });
+        function creteDocumentInserterElement(value) {
+            if (isNewItem) {
+                if (value.FilePath) return documentInserter.createRemovableNewValueElement(value);
+                return documentInserter.createNewValueElement(value);
+            } else {
+                if (value.FilePath) {
+                    const { parent, mainBtn, refreshBtn } = documentInserter.createRefreshableNewValueA(value, "/open?fp=" + value.FilePath);
+                    $(refreshBtn).data('document-id', value.DocumentId);
+                    $(refreshBtn).data('item-id', value.ItemId);
+                    return parent;
+                }
+                return documentInserter.createNewValueElement(value);
+            }
+        }
+        function openDocument(editIndex, doc) {
+            if (isNewItem) {
+                // the openDocument have binded this, so bind it further
+                const uploadDocumentFunction = uploadDocument.bind(this);
+                uploadDocumentFunction(editIndex, doc);
+            } else {
+                // opening by direct link
+                console.log("open")
+                console.log(editIndex)
+                console.log(doc)
+            }
+        }
+        function removeDocument(doc) {
+            console.log("remove")
+        }
+        function appendProgressMessage(raw) {
+            console.log(raw);
+            if (!raw) return;
+            const $display = $('#stderrDisplay');
+            const encoded = $('<div/>').text(raw).html();
+            $display.append('<div>' + encoded.replace(/\r\n|\n/g, '<br>') + '</div>');
+            $display.scrollTop($display[0].scrollHeight);
+        }
+        function handleErr(raw) {
+            if (!raw) return;
+            const $display = $('#stderrDisplay');
+            const encoded = $('<div/>').text(raw).html();
+            $display.append('<div>' + encoded.replace(/\r\n|\n/g, '<br>') + '</div>');
+            $display.scrollTop($display[0].scrollHeight);
+            documentRegenerator.afterSuccessResponse(raw);
+        }
+        function handleFinish(raw) {
+            documentRegenerator.afterSuccessResponse(raw);
+        }
+
+        $(document).ready(function () {
+            $('#resetStatus-button').on('click', function (event) {
+                event.preventDefault(); // Prevent the default action of the link
+                $('#confirmStatusResetModal').modal('show'); // Manually show the modal
+            });
+
+            // Use delegated handlers so newly inserted buttons/anchors receive the same behavior
+            const canUpload = @(ViewBag.CanUploadDocuments == true ? "true" : "false");
+
+            $('.debugFileBtn').on('click', function() {
+                var url = $(this).data('uri');
+                if (url) {
+                    window.open(url, '_blank');
+                }
+            });
+            $('.viewDocumentBtn').on('click', function() {
+                var url = $(this).data('file-path');
+                if (url) {
+                    window.open(url, '_blank');
+                }
+            });
+        });
+
+        function uploadDocument(editIndex, doc) {
+            // clear messages and remember clicked button
+            $('#stderrDisplay').text('');
+            const documentId = doc.DocumentId;
+            const itemId = $(this).data('item-id');
+
+            let $form = $('#documentsUploadForm');
+            // remove any previous file input for this document id (we keep only last selected file per document)
+            $form.find(`input[type="file"][data-document-id="${documentId}"]`).remove();
+
+            // create a new hidden file input and append it to the hidden form
+            const $fileInput = $('<input>', {
+                type: 'file',
+                style: 'display:none;',
+                'data-document-id': documentId
+            }).appendTo($form);
+
+            // handle file selection
+            $fileInput.off('change').on('change', documentPicked.bind($fileInput[0], this, doc));
+
+            // open native file dialog
+            $fileInput.click();
+        }
+        function documentPicked(documentBtn, doc) {
+            console.log(doc)
+            const file = this.files && this.files[0];
+            if (!file) return;
+
+            const maxBytes = 5 * 1024 * 1024; // 5 MB
+            if (file.size > maxBytes) {
+                console.log('nono')
+                alert('Selected file must be smaller than 5 MB.');
+                $(this).remove();
+                return;
+            }
+
+            const documentId = $(this).data('document-id');
+            const sizeKb = Math.round(file.size / 1024);
+            $(documentBtn).text(doc.Title + ': ' + file.name + ' (' + sizeKb + ' KB)');
+        }
+    </script>
+
+    @await Html.PartialAsync("_DevicesPickerModalScripts")
+}

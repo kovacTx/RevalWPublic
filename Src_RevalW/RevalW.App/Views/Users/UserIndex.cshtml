@@ -1,0 +1,180 @@
+﻿@using RevalW.Shared.Model;
+@using RevalW.Shared.Utils;
+@{
+    var isLogged = User?.Identity?.IsAuthenticated == true;
+    var isCreator = isLogged && User?.IsInRole(ERoles.Creator) == true;
+    var isUberAdmin = isLogged && User?.IsInRole(ERoles.UberAdmin) == true;
+
+}
+@section Meta {
+    <meta name="description" content="Manage the users of the organization of the RevalW Agenda." />
+    <meta property="og:title" content="User Management | RevalW Agenda" />
+}
+@model IEnumerable<UserDto>
+<style>
+    /* Resizable table styling */
+    #tblData {
+        table-layout: fixed; /* recommended for column resize plugins */
+        width: 100% !important;
+    }
+
+    #tblData th, #tblData td {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    #tblData .grip {
+        width: 8px;
+        height: 100%;
+        background: transparent;
+    }
+
+    .dragging {
+        /* no-op, reserved for plugin */
+    }
+
+    .tableContainer {
+        min-width: 550px;
+    }
+
+</style>
+<div class="card shadow border-0 mt-4 tableContainer">
+    <div class="d-flex align-items-center m-4">
+        <div class="flex-grow-1 text-center">
+            <h1 class="m-0">User management</h1>
+        </div>
+        <a class="btn btn-primary ms-3" asp-controller="Auth" asp-action="Register">
+            Register new
+        </a>
+    </div>
+    <div class="card-body">
+        <table id="tblData" class="table table-bordered table-striped pt-3" style="width:100%">
+            <thead>
+                <tr>
+                    @if (isUberAdmin)
+                    {
+                        <th>OrganizationId</th>
+                    }
+                    <th>Email</th>
+                    <th>Name</th>
+                    <th>PhoneNumber</th>
+                    <th>Roles</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<!-- Bootstrap Modal for delete -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this user?
+            </div>
+            <div class="modal-footer">
+                <form method="get" id="deleteForm" action="/Users/Delete">
+                    <input type="hidden" name="id" id="deleteId" />
+                    <button type="submit" class="btn btn-primary">OK</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- colResizable plugin (adds user column resize handles) -->
+    <script src="https://cdn.jsdelivr.net/gh/alvaro-prieto/colResizable/colResizable-1.6.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            dataTable = $('#tblData').DataTable({
+                processing: true,
+                serverSide: true,
+                autoWidth: false,
+                ajax: {
+                    url: "/Users/GetAll",
+                    type: 'POST'
+                },
+                columns: [
+                    @if (isUberAdmin)
+                    {
+                        <text>
+                            { data: 'OrganizationId', width: '55px' },
+                        </text>
+                    }
+                    { data: 'Email' },
+                    { data: 'Name' },
+                    { data: 'PhoneNumber' },
+                    {
+                        data: 'Roles',
+                        render: function (data) {
+                            return data.join(', ');
+                        } },
+                    {
+                        data: 'ID',
+                        render: function (data) {
+                            return `<div class="w-75 btn-group" role="group">
+                                <a href="/Users/Update?id=${data}" class="btn btn-primary btn-success mx-1 rounded-start-5 rounded-end-0">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="#" class="btn btn-primary btn-danger mx-1 rounded-start-0 rounded-end-5 delete-button" data-user-id="${data}">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>`;
+                        },
+                        width: '120px'
+                    }
+                ],
+                initComplete: function (settings, json) {
+                    applyColumnResizing();
+                },
+                drawCallback: function (settings) {
+                    applyColumnResizing();
+                }
+            });
+            $('#tblData').on('xhr.dt', function (e, settings, json, xhr) {
+                console.log('DataTables AJAX response (xhr.dt):', json);
+            });
+            $('#tblData').on('click', '.delete-button', function (event) {
+                event.preventDefault(); // Prevent the default action of the link
+                var userId = $(this).data('user-id');
+                $('#deleteId').val(userId);
+                $('#confirmDeleteModal').modal('show'); // Manually show the modal
+            });
+        });
+
+        // helper to (re)apply column resizing
+        function applyColumnResizing() {
+            try {
+                // if already initialized, disable first to avoid duplicate handles
+                if ($('#tblData').data('colResizable')) {
+                    $('#tblData').colResizable({ disable: true });
+                }
+            } catch (e) {
+                // ignore if plugin not initialized yet
+            }
+
+            // initialize colResizable
+            try {
+                $('#tblData').colResizable({
+                    liveDrag: true,
+                    minWidth: 30,
+                    gripInnerHtml: "<div class='grip'></div>",
+                    draggingClass: "dragging",
+                    partialRefresh: true
+                });
+            } catch (e) {
+                console.warn("colResizable init failed:", e);
+            }
+        }
+
+    </script>
+}

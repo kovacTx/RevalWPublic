@@ -1,0 +1,137 @@
+<script src="https://cdn.jsdelivr.net/gh/alvaro-prieto/colResizable/colResizable-1.6.min.js"></script>
+
+<script>
+    // Modal helpers - this script must be rendered after jQuery & DataTables are loaded.
+    function devicePickerShow() {
+        $('#devicesPickerModal').modal('show');
+        if (!$.fn.dataTable.isDataTable('#tblData')) {
+            LoadDevicesPickerTable();
+        } else {
+            $('#tblData').DataTable().ajax.reload();
+        }
+    }
+
+    function devicePickedInternal(e) {
+        e.preventDefault();
+
+        const emptyDeviceId = !$('#DeviceId').val() || $('#DeviceId').val() == '' || $('#DeviceId').val() == 0;
+        if (!emptyDeviceId) {
+            if (!confirm("Are you sure you want to insert selected device into actual item?")) return;
+        }
+
+        if (typeof devicePicked === 'function') {
+            try {
+                const id = $(this).data('item-id');
+                $('#DeviceId').val(id);
+                devicePicked(true);
+
+                const label = $(this).data('item-label') || id;
+                $('#ShowDevicesBtn').text(id + ' - ' + label);
+
+            } catch (ex) {
+                $('#DeviceId').val('');
+                console.warn('fetchDevice missing or failed', ex);
+            }
+        } else {
+            const id = $(this).data('item-id');
+            $('#DeviceId').val(id);
+
+            const label = $(this).data('item-label') || id;
+            $('#ShowDevicesBtn').text(id + ' - ' + label);
+        }
+
+        $('#devicesPickerModal').modal('hide');
+    }
+
+    // helper to (re)apply column resizing
+    function applyColumnResizing() {
+        try {
+            // if already initialized, disable first to avoid duplicate handles
+            if ($('#tblData').data('colResizable')) {
+                $('#tblData').colResizable({ disable: true });
+            }
+        } catch (e) {
+            // ignore if plugin not initialized yet
+        }
+
+        // initialize colResizable
+        try {
+            $('#tblData').colResizable({
+                liveDrag: true,
+                minWidth: 30,
+                gripInnerHtml: "<div class='grip'></div>",
+                draggingClass: "dragging",
+                partialRefresh: true
+            });
+        } catch (e) {
+            console.warn("colResizable init failed:", e);
+        }
+    }
+
+    function LoadDevicesPickerTable() {
+        const params = new URLSearchParams(window.location.search);
+        const status = params.get("status") || "new";
+        $('#tblData').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "/Devices/GetAll",
+                type: 'POST',
+                data: function (d) {
+                    d.statusFilter = status;
+                    return d;
+                }
+            },
+            columns: [
+                { data: 'Id', width: '55px' },
+                @if (User?.Identity?.IsAuthenticated == true && User?.IsInRole("UberAdmin") == true)
+                {
+                    <text>{ data: 'OrganizationId', width: '2%' },</text>
+                }
+                { data: 'Label', width: '155px' },
+                @if (ViewBag.DeviceGridColumns != null && ViewBag.DeviceGridColumns.Count > 0)
+                {
+                    foreach (var mgc in ViewBag.DeviceGridColumns)
+                    {
+                        <text>
+                        {
+                            data: null,
+                            render: (data, type, row, meta) => {
+                                const obj = JSON.parse(data.DeviceDataJson);
+                                return obj?.["@mgc.Name"] ?? "";
+                            }
+                        },
+                        </text>
+                    }
+                }
+                {
+                    data: 'Tags',
+                    render: function (data) {
+                        return data.join(", ");
+                    },
+                    width: '100px'
+                },
+                {
+                    data: null,
+                    render: function (data, type, row, meta) {
+                        const openDiv = `<div class="w-100 btn-group" role="group">`;
+                        const closeDiv = `</div>`;
+                        const selectBtn = `<a href="#" class="btn btn-primary select-device-button" data-item-id="${data.Id}" data-item-label="${data.Label}"><i class="bi bi-check2-circle"></i> Select</a>`;
+                        return openDiv + selectBtn + closeDiv;
+                    },
+                    width: '120px'
+                }
+            ],
+            initComplete: function (settings, json) {
+                applyColumnResizing();
+            },
+            drawCallback: function (settings) {
+                applyColumnResizing();
+            }
+        });
+    }
+
+    // attach delegated handlers (safe because this script is rendered after jQuery)
+    $(document).on('click', '#ShowDevicesBtn', devicePickerShow);
+    $(document).on('click', '.select-device-button', devicePickedInternal);
+</script>

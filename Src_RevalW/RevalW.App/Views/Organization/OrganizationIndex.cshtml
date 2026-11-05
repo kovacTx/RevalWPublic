@@ -1,0 +1,58 @@
+﻿@using RevalW.Shared.Model
+@model IEnumerable<OrganizationDto>
+
+<div class="card shadow border-0 mt-4">  
+    <div class="card-body p-4">
+        <table id="tblData" class="table table-bordered table-striped pt-3" style="width:100%">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>CountryRegion</th>
+                    <th>Tags</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            dataTable = $('#tblData').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "/Organization/GetAll",
+                    type: 'POST'
+                },
+                "columns": [
+                    { data: 'id', width: "2%" },
+                    { data: 'name', width: "40%" },
+                    { data: 'description', width: "3%" },
+                    { data: 'coutryRegion', width: "15%" },
+                    {
+                        data: 'tags',
+                        render: function (data) {
+                            return data.join(', ');
+                        },
+                        width: "15%" },
+                    {
+                        data: 'id',
+                        render: function (data) {
+                            return `<div class="w-75 btn-group" role="group">
+                                <a href="/Organization/Organization?id=${data}" class="btn btn-primary btn-success mx-1">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </div>`;
+                        },
+                        width: "5%"
+                    }
+                ]
+            })
+        });
+
+    </script>
+}
