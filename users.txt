@@ -1,0 +1,19 @@
+{
+  "email": "ubadmin@adm.com",
+  "name": "uberAdmin",
+  "phomeNumber": "string",
+  "password": "ubAdmin123*",
+  "role": "UBERADMIN"
+}
+{
+  "email": "ubadmin@adm.com",
+  "password": "ubAdmin123*"
+}
+
+{
+  "email": "admin@adm.com",
+  "name": "obycAdmin",
+  "phomeNumber": "string",
+  "password": "Admin123*",
+  "role": "ADMIN"
+}
