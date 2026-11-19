@@ -1,0 +1,35 @@
+[
+  {
+    "Name": "API",
+    "Projects": [
+      {
+        "Path": "RevalW.Services.ItemsAPI\\RevalW.Services.ItemsAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "RevalW.Services.AuthAPI\\RevalW.Services.AuthAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "RevalW.Services.TemplatesAPI\\RevalW.Services.TemplatesAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "RevalW.Gateway\\RevalW.Gateway.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "RevalW.Services.OrganizationAPI\\RevalW.Services.OrganizationAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "RevalW.Services.DocumentsAPI\\RevalW.Services.DocumentsAPI.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "RevalW.Services.DevicesAPI\\RevalW.Services.DevicesAPI.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

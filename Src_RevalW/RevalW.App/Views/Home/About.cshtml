@@ -1,0 +1,122 @@
+﻿@{
+    ViewData["Title"] = "About";
+}
+
+<div class="text-start">
+    <div class="d-flex align-items-center justify-content-center gap-3 mb-3">
+        <h1 class="display-4 m-0"><strong>Revalion Software</strong></h1>
+        <a asp-controller="Home" asp-action="Privacy" class="align-self-end">Privacy</a>
+    </div>
+
+    <div class="text-center mb-3">
+        <p><strong>RevalW</strong> is a versatile web application for designing and managing user form configurations, evaluation logic, and document templates.</p>
+        <p>Its companion mobile app, <strong>RevalM</strong>, allows users to perform evaluations directly in the field and synchronize results back to the web platform for reporting.</p>
+        <p>Together, they provide a complete solution for metrology, audits, revisions, and a wide range of technical and business applications.</p>
+    </div>
+
+    <div class="alert alert-warning">
+        ⚠️ This page and the entire project are currently under active development.
+    </div>
+
+    <hr />
+
+    <h3>Platform Overview</h3>
+    <p>
+        Revalion is a configurable platform for managing field workflows such as metrology (calibrations, verifications), inspections, and audits.
+        It covers the full workflow from <strong>form configuration → work item creation → mobile execution → evaluation → document generation → synchronization</strong> (full workflow management is planned for completion).
+        The platform already supports <strong>multi-tenant and role-based configurations</strong>, allowing organizations to manage users, permissions, and access control efficiently across multiple teams or clients.
+    </p>
+
+    <h4>Key Features</h4>
+    <ul>
+        <li><strong>Configurable Forms:</strong> Dynamic forms with validation, evaluation logic, and statistical calculations.</li>
+        <li><strong>Document Generation:</strong> Certificates, audit reports, invoices, or custom templates automatically generated and accessible to end users.</li>
+        <li><strong>Mobile Integration:</strong> .NET MAUI app for Android and Windows with offline capabilities and sync back to RevalW.</li>
+        <li><strong>Multi-Tenant & Role-Based Configuration:</strong> Fully implemented; manage multiple organizations, users, and permissions within a single platform.</li>
+        <li><strong>Planned Features:</strong> Full workflow management, reuse of calibration results as reference parameters, and enhanced analytics.</li>
+    </ul>
+
+    <h4>Technical Architecture</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Component</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Web App</td>
+                <td>ASP.NET / Razor, for configuration, reporting, and document generation</td>
+            </tr>
+            <tr>
+                <td>Mobile App</td>
+                <td>.NET MAUI for Android & Windows, offline-capable, synchronizes data back to server</td>
+            </tr>
+            <tr>
+                <td>Backend</td>
+                <td>Microservices architecture, REST API, business logic, evaluation engine</td>
+            </tr>
+            <tr>
+                <td>Database</td>
+                <td>PostgreSQL with multi-tenant support, audit logging, and history tracking</td>
+            </tr>
+            <tr>
+                <td>Security</td>
+                <td>Role-based access control, configurable permissions, secure data handling</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h4>Use Case Example: Calibration Workflow</h4>
+    <ol>
+        <li><strong>Configuration:</strong> Define form fields, validation rules, evaluation logic, and document templates.</li>
+        <li><strong>Item Creation:</strong> Generate a work item based on the configuration.</li>
+        <li><strong>Field Data Collection:</strong> Export item to MAUI app; field operator collects data.</li>
+        <li><strong>Evaluation:</strong> App calculates results and flags issues.</li>
+        <li><strong>Document Generation:</strong> Selected documents are generated automatically.</li>
+        <li><strong>Synchronization:</strong> Completed work item is synced back to the server.</li>
+    </ol>
+
+    <hr />
+
+    <h4>What You Can Do Today</h4>
+    <h5>Organization & User Management</h5>
+    <ul>
+        <li>Register as an organization (Creator role)</li>
+        <li>Edit organization info (via the email menu in the upper-right corner)</li>
+        <li>Create and manage users with configured rights within your organization</li>
+    </ul>
+
+    <h5>Configuration & Evaluation</h5>
+    <ul>
+        <li>Create form configurations with custom evaluation logic</li>
+        <li>Define PDF output templates generated after successful form completion</li>
+        <li>Edit configuration content directly in a text area (Quick save via Ctrl + S)</li>
+        <li>Create evaluation items that can be loaded into the mobile app (RevalM)</li>
+    </ul>
+
+    <h5>Field Evaluation</h5>
+    <ul>
+        <li>Load assigned items into RevalM</li>
+        <li>Enter measured values and perform evaluations</li>
+        <li>Transfer completed evaluations back to RevalW</li>
+        <li>Generate professional PDF reports via the web application</li>
+    </ul>
+
+    <h4>Under Construction 🚧</h4>
+    <ul>
+        <li>RevalM mobile app (Android & iOS)</li>
+        <li>Displays configured forms</li>
+        <li>Performs evaluations offline or in the field</li>
+        <li>Synchronizes completed evaluations with RevalW</li>
+    </ul>
+
+    <hr />
+
+    <h4>Opportunities for Collaboration</h4>
+    <p>
+        Revalion is ready for pilot programs, partnerships, or funding to move toward full production and market launch.
+        Opportunities include testing, co-development of advanced features, and equity-based collaboration.
+    </p>
+</div>

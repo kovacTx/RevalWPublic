@@ -1,0 +1,29 @@
+﻿@model RevalW.App.Model.MapViewModel
+
+<div id="map" style="height:400px; width:100%; border:1px solid #ccc;"></div>
+
+<script>
+    (function() {
+        var el = document.getElementById('map');
+        var points = @Html.Raw(Model.PointsJson);
+
+        window.initMap = function () {
+            var map = new google.maps.Map(el, { zoom: 2, center: { lat: 0, lng: 0 } });
+            var bounds = new google.maps.LatLngBounds();
+
+            points.forEach(function (p) {
+                if (p.latitude && p.longitude) {
+                    var pos = { lat: p.latitude, lng: p.longitude };
+                    var marker = new google.maps.Marker({ position: pos, map: map, title: p.label || p.address });
+                    var info = new google.maps.InfoWindow({ content: '<strong>' + (p.label || '') + '</strong><br/>' + (p.address || '') });
+                    marker.addListener('click', function () { info.open(map, marker); });
+                    bounds.extend(pos);
+                }
+            });
+
+            if (!bounds.isEmpty()) map.fitBounds(bounds, 50);
+        };
+    })();
+</script>
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=@Model.ApiKey&callback=initMap"></script>

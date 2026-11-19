@@ -1,0 +1,35 @@
+﻿@{
+    ViewData["Title"] = "RevalW";
+    var tags = ViewBag.AvailableTags as IEnumerable<string> ?? [];
+}
+<div class="text-start">
+    
+    <div id="mapContainer">
+        @await Component.InvokeAsync("Map", new { addresses = ViewBag.Addresses })
+    </div>
+
+    <div class="border form-group my-2 p-2">
+        <div id="tagsContainer" class="d-flex flex-row gap-2">
+            @foreach (var name in tags)
+            {
+                <div class="form-check">
+                    <input class="form-check-input tag-checkbox"
+                           type="checkbox"
+                           name="SelectedTags"
+                           value="@name"
+                           id="tag_@name"
+                           checked />
+
+                    <label class="form-check-label" for="tag_@name">
+                        @name
+                    </label>
+                </div>
+            }
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script src="~/js/organizationViewer.js"></script>
+}

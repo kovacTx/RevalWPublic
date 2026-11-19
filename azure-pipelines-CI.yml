@@ -1,0 +1,60 @@
+name: $(Date:yyyyMMdd).$(Rev:r)
+
+trigger: none
+
+pr:
+  branches:
+    include:
+    - master
+
+pool:
+  name: LocalWindows
+
+variables:
+  BuildConfiguration: 'Release'
+  DotNetSdkVersion: '8.0.x'
+  Solution: 'Src_RevalW/RevalW.sln'
+  IsPR: $[eq(variables['Build.Reason'], 'PullRequest')]
+
+stages:
+- stage: CI
+  displayName: CI (restore/build/test + package on master)
+  jobs:
+  - job: BuildTest
+    displayName: Build & Test
+    steps:
+    - checkout: self
+      fetchDepth: 1
+
+    - task: UseDotNet@2
+      displayName: 'Use .NET SDK $(DotNetSdkVersion)'
+      inputs:
+        packageType: 'sdk'
+        version: '$(DotNetSdkVersion)'
+
+    #- task: Cache@2
+    #  displayName: 'Cache NuGet packages'
+    #  inputs:
+    #    key: 'nuget | "$(Agent.OS)" | **/*.csproj, **/NuGet.config, **/packages.lock.json, $(Solution)'
+    #    restoreKeys: |
+    #      nuget | "$(Agent.OS)"
+    #    path: '$(UserProfile)\.nuget\packages'
+
+    - script: dotnet restore "$(Solution)"
+      displayName: 'Restore'
+
+    - script: dotnet build "$(Solution)" --configuration $(BuildConfiguration) --no-restore
+      displayName: 'Build'
+
+    - script: dotnet test "$(Solution)" --configuration $(BuildConfiguration) --no-build --logger "trx"
+      displayName: 'Test'
+
+    - task: PublishTestResults@2
+      displayName: 'Publish test results'
+      condition: succeededOrFailed()
+      inputs:
+        testResultsFormat: 'VSTest'
+        testResultsFiles: '**/*.trx'
+        searchFolder: '$(System.DefaultWorkingDirectory)'
+        mergeTestResults: true
+        failTaskOnFailedTests: true

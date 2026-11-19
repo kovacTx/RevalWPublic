@@ -1,0 +1,88 @@
+﻿@using RevalW.Shared.Model
+@using RevalW.Shared.Utils
+@{
+    var isLogged = User?.Identity?.IsAuthenticated == true;
+    var isCreator = isLogged && User?.IsInRole(ERoles.Creator) == true;
+    var isUberAdmin = isLogged && User?.IsInRole(ERoles.UberAdmin) == true;
+
+}
+@section Meta {
+    <meta name="description" content="Manage the users of the organization of the RevalW Agenda." />
+    <meta property="og:title" content="User Management | RevalW Agenda" />
+}
+@model IEnumerable<UserDto>
+
+<div class="card shadow border-0 mt-4">
+    <div class="d-flex align-items-center m-4">
+        <div class="flex-grow-1 text-center">
+            <h1 class="m-0">User management</h1>
+        </div>
+        <a class="btn btn-primary ms-3" asp-controller="Auth" asp-action="Register">
+            Register new
+        </a>
+    </div>
+    <div class="card-body">
+        <table id="tblData" class="table table-bordered table-striped pt-3" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Name</th>
+                    <th>PhoneNumber</th>
+                    @if (isUberAdmin)
+                    {
+                        <th>OrganizationId</th>
+                    }
+                    <th>Roles</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            dataTable = $('#tblData').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "/Users/UberGetAll",
+                    type: 'POST'
+                },
+                "columns": [
+                    { data: 'email', width: "10%" },
+                    { data: 'name', width: "10%" },
+                    { data: 'phoneNumber', width: "15%" },
+                    @if (isUberAdmin)
+                    {
+                        <text>
+                            { data: 'organizationId', width: "10%" },
+                        </text>
+                    }
+                    {
+                        data: 'roles',
+                        render: function (data) {
+                            return data.join(', ');
+                        },
+                        width: "10%" },
+                    {
+                        data: 'id',
+                        render: function (data) {
+                            return `<div class="w-75 btn-group" role="group">
+                                <a href="/Users/Update?id=${data}" class="btn btn-primary btn-success mx-1 rounded-start-5 rounded-end-0">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="/Users/Delete?id=${data}" class="btn btn-primary btn-danger mx-1 rounded-start-0 rounded-end-5">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>`;
+                        },
+                        width: "10%"
+                    }
+                ]
+            })
+        });
+
+    </script>
+}

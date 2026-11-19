@@ -1,0 +1,225 @@
+﻿@using Microsoft.AspNetCore.Html
+@using System.Text
+@using RevalW.App.Controllers
+@using RevalW.App.Utils
+@using RevalW.Shared.Model
+@using RevalW.Shared.Utils
+@model InnerItemUpsertDto
+@{
+    ViewData["Title"] = "View Details";
+    var tags = ViewBag.AvailableTags as IEnumerable<string> ?? [];
+    var itemValues = ViewBag.ItemValues as Dictionary<string, string>;
+}
+<style>
+    .half-height-btn {
+        height: 1.5rem;
+        line-height: 1.5rem;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+</style>
+<div class="container border p-4" >
+    <div class="position-relative p-3">
+        <h1 class="text-center mb-0">View Details</h1>
+    </div>
+    <fieldset disabled>
+        <div class="row">
+            <div class="border form-group my-2 p-2">
+                <h6>Tags</h6>
+                <div id="TagsContainer" class="d-flex flex-row flex-wrap gap-2 align-items-start">
+                    @if (ViewBag.Tags != null && ViewBag.Tags.Count > 0)
+                    {
+                        for (int i = 0; i < ViewBag.Tags.Count; i++)
+                        {
+                            string tn = ViewBag.Tags[i];
+                            if (string.IsNullOrEmpty(tn)) continue;
+                            <div class="d-flex align-items-center input-row">
+                                <button type="button" class="btn btn-primary value-button rounded-start-5 rounded-end-0" data-label="@tn">
+                                    @tn
+                                </button>
+                                <button type="button" class="btn btn-danger remove-button rounded-start-0 rounded-end-5">x</button>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </fieldset>
+    <div class="row">
+        <div class="border form-group my-2 p-2">
+            <h6>Documents</h6>
+            <div id="DocumentsContainer" class="d-flex flex-row flex-wrap gap-2 align-items-start">
+                @foreach (var gd in Model.GeneratedDocuments)
+                {
+                    <div class="d-flex align-items-center input-row">
+                        @if (!string.IsNullOrEmpty(gd.FilePath))
+                        {
+                            <button type="button" class="btn btn-primary value-button rounded-start-5 rounded-end-5">
+                                @gd.Title
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-danger value-button rounded-start-5 rounded-end-5 generateDocumentBtn"
+                                    data-item-id="@gd.ItemId" data-document-id="@gd.DocumentId">
+                                @gd.Title
+                            </button>
+                        }
+                    </div>
+                }
+                @if (ViewBag.DebugFiles != null && ViewBag.DebugFiles.Count > 0)
+                {
+                    <div class="d-flex flex-column align-items-end ms-auto">
+                        @foreach (DebugFile debugFile in ViewBag.DebugFiles)
+                        {
+                            <button type="button" class="btn btn-primary value-button rounded-start-5 rounded-end-5 mb-1 half-height-btn debugFileBtn"
+                                    data-uri="@debugFile.Path">
+                                @debugFile.Name
+                            </button>
+                        }
+                    </div>
+                }
+            </div>
+            <div id="stderrDisplay" style="color: red; margin-top: 10px;"></div>
+        </div>
+    </div>
+    <fieldset disabled>
+        <div class="row">
+            @if (ViewBag.NewItemProperties != null && ViewBag.NewItemProperties.Count > 0)
+            {
+                <div class="border form-group my-2 p-2">
+                    <h6>Properties</h6>
+                    @foreach (DynamicPropertyDto dp in ViewBag.NewItemProperties)
+                    {
+                        <div class="form-group">
+                            <label class="control-label" for="@dp.Name">@dp.Label</label>
+                            @if (dp.InputType == "comboBox")
+                            {
+                                <select class="form-control dynamic-property" data-property-name="@dp.Name"
+                                        @(dp.Required ? "required" : null) @(dp.Readonly ? "readonly" : null)>
+                                    <option value="" selected disabled>-- Select --</option>
+                                    @foreach (var option in dp.ComboOptions?.Split(",") ?? ["none options provided"])
+                                    {
+                                        var selected = itemValues != null && itemValues.ContainsKey(dp.Name)
+                                        ? itemValues[dp.Name] == option
+                                            : option == dp.Default;
+                                        <option value="@option" selected="@selected">@option</option>
+                                    }
+                                </select>
+                            }
+                            else
+                            {
+                                <input class="form-control dynamic-property" data-property-name="@dp.Name"
+                                        type="@dp.InputType" max="@dp.Max" min="@dp.Min" step="@dp.Step"
+                                        value="@(itemValues is not null && itemValues.ContainsKey(dp.Name) ? itemValues[dp.Name] : dp.Default)"
+                                        required=@(dp.Required) readonly=@(dp.Readonly) />
+                            
+                            }
+                        </div>
+                    }
+                </div>
+            }
+            @if (Model?.Id > 0)
+            {
+                <div class="border my-2 p-2">
+                    <div>created by: @ViewBag.UserIdCreated</div>
+                    <div>exported by: @ViewBag.UserIdExported</div>
+                    <div>imported by: @ViewBag.UserIdImported</div>
+                    <div>finished by: @ViewBag.UserIdFinalized</div>
+                    <div>deleted by: @ViewBag.UserIdDeleted</div>
+                    <div>undeleted by: @ViewBag.UserIdUndeleted</div>
+                    <div>marked as readonly by: @ViewBag.UserIdReadonlied</div>
+                    <div>used config id: @ViewBag.UsedConfigId</div>
+
+                    <label asp-for="AppDataJson" class="control-label">Application Data</label>
+                    <textarea asp-for="AppDataJson" class="form-control w-100 no-wrap font-monospace" rows="5" readonly></textarea>
+                </div>
+            }
+        </div>
+    </fieldset>
+</div>
+
+<div class="card-footer row mx-0">
+    <div class="col-6 col-md-3">
+        <a asp-action="ItemIndex" class="btn btn-primary form-control ">Back to List</a>
+    </div>
+    
+</div>
+
+<!-- Bootstrap Modal for statusReset -->
+<div class="modal fade" id="confirmStatusResetModal" tabindex="-1" aria-labelledby="confirmStatusResetModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmStatusResetModalLabel">Confirm Status reset</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to reset status of this item?
+            </div>
+            <div class="modal-footer">
+                <form method="get" id="statusResetForm" asp-controller="Items" asp-action="MarkAsNew" >
+                    <input type="hidden" name="id" asp-for="Id" />
+                    <button type="submit" class="btn btn-primary">OK</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script src="~/js/valueInserter.js"></script>
+
+    <script src="~/js/itemTagPick.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#resetStatus-button').on('click', function (event) {
+                event.preventDefault(); // Prevent the default action of the link
+                $('#confirmStatusResetModal').modal('show'); // Manually show the modal
+            });
+            $('.generateDocumentBtn').on('click', function() {
+                $('#stderrDisplay').text('');
+                if ($(this).hasClass('btn-primary')) return;
+
+                var itemId = $(this).data('item-id');
+                var documentId = $(this).data('document-id');
+                var $btn = $(this);
+                $('#stderrDisplay').text('generating...');
+                $.ajax({
+                    url: '/Items/GenerateDocument',
+                    type: 'GET',
+                    data: {
+                        itemId: itemId,
+                        documentId: documentId
+                    },
+                    success: function(response) {
+                        console.log(response)
+                        if (!response) {
+                            $('#stderrDisplay').text('Error communicating with server');
+                        } else if (response.message) {
+                            $('#stderrDisplay').text('Error communicating with server: ' + response.message);
+                        } else if (!response.result) {
+                            $('#stderrDisplay').text('Error communicating with server');
+                        } else if (response.result.stdErr) {
+                            $('#stderrDisplay').html(response.result.stdErr.replace(/\r\n|\n/g, '<br>'));
+                        } else {
+                            $('#stderrDisplay').html('');
+                            $btn.removeClass('btn-danger').addClass('btn-primary');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        $('#stderrDisplay').text('Error communicating with server: ' + error);
+                    }
+                });
+            });
+            $('.debugFileBtn').on('click', function() {
+                var url = $(this).data('uri');
+                if (url) {
+                    window.open(url, '_blank');
+                }
+            });
+        });
+    </script>
+} 

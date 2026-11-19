@@ -1,0 +1,146 @@
+name: $(Date:yyyyMMdd).$(Rev:r)
+
+trigger:
+  branches:
+    include:
+    - master
+    
+pr: none
+
+pool:
+  name: LocalWindows
+
+variables:
+  BuildConfiguration: 'Release'
+  DotNetSdkVersion: '8.0.x'
+  Solution: 'Src_RevalW/RevalW.sln'
+  IsPR: $[eq(variables['Build.Reason'], 'PullRequest')]
+
+stages:
+- stage: CI
+  displayName: CI (restore/build/test + package on master)
+  jobs:
+  - job: BuildTest
+    displayName: Build & Test
+    steps:
+    - checkout: self
+      fetchDepth: 1
+
+    - task: UseDotNet@2
+      displayName: 'Use .NET SDK $(DotNetSdkVersion)'
+      inputs:
+        packageType: 'sdk'
+        version: '$(DotNetSdkVersion)'
+
+    #- task: Cache@2
+    #  displayName: 'Cache NuGet packages'
+    #  inputs:
+    #    key: 'nuget | "$(Agent.OS)" | **/*.csproj, **/NuGet.config, **/packages.lock.json, $(Solution)'
+    #    restoreKeys: |
+    #      nuget | "$(Agent.OS)"
+    #    path: '$(UserProfile)\.nuget\packages'
+
+    - script: dotnet restore "$(Solution)"
+      displayName: 'Restore'
+
+    - script: dotnet build "$(Solution)" --configuration $(BuildConfiguration) --no-restore
+      displayName: 'Build'
+
+    - script: dotnet test "$(Solution)" --configuration $(BuildConfiguration) --no-build --logger "trx"
+      displayName: 'Test'
+
+    - task: PublishTestResults@2
+      displayName: 'Publish test results'
+      condition: succeededOrFailed()
+      inputs:
+        testResultsFormat: 'VSTest'
+        testResultsFiles: '**/*.trx'
+        searchFolder: '$(System.DefaultWorkingDirectory)'
+        mergeTestResults: true
+        failTaskOnFailedTests: true
+
+    # Publish each service into its own folder under the artifact staging directory
+    - script: |
+        dotnet publish "Src_RevalW/RevalW.Services.AuthAPI/RevalW.Services.AuthAPI.csproj" --configuration $(BuildConfiguration) --no-build --output "$(Build.ArtifactStagingDirectory)\bin\AuthAPI"
+        dotnet publish "Src_RevalW/RevalW.Services.TemplatesAPI/RevalW.Services.TemplatesAPI.csproj" --configuration $(BuildConfiguration) --no-build --output "$(Build.ArtifactStagingDirectory)\bin\TemplatesAPI"
+        dotnet publish "Src_RevalW/RevalW.App/RevalW.App.csproj" --configuration $(BuildConfiguration) --no-build --output "$(Build.ArtifactStagingDirectory)\bin\MainApp"
+      displayName: 'Publish services (separate folders)'
+
+    - powershell: |
+        Remove-Item -Recurse -Force "$(Build.ArtifactStagingDirectory)\publish" -ErrorAction SilentlyContinue
+        New-Item -ItemType Directory -Force -Path "$(Build.ArtifactStagingDirectory)\publish" | Out-Null
+      displayName: 'Prepare publish folder'
+
+    # Zip each service output (zip deploy to App Service expects a zip)
+    - task: ArchiveFiles@2
+      displayName: 'Zip AuthAPI'
+      inputs:
+        rootFolderOrFile: '$(Build.ArtifactStagingDirectory)\bin\AuthAPI'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)\publish\AuthAPI.zip'
+        replaceExistingArchive: true
+
+    - task: ArchiveFiles@2
+      displayName: 'Zip TemplatesAPI'
+      inputs:
+        rootFolderOrFile: '$(Build.ArtifactStagingDirectory)\bin\TemplatesAPI'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)\publish\TemplatesAPI.zip'
+        replaceExistingArchive: true
+
+    - task: ArchiveFiles@2
+      displayName: 'Zip MainApp'
+      inputs:
+        rootFolderOrFile: '$(Build.ArtifactStagingDirectory)\bin\MainApp'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)\publish\MainApp.zip'
+        replaceExistingArchive: true
+
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish artifact'
+      inputs:
+        targetPath: '$(Build.ArtifactStagingDirectory)\publish'
+        artifact: 'drop'
+
+- stage: CD
+  displayName: CD (deploy to Azure App Service)
+  dependsOn: CI
+  # Only deploy from non-PR builds on master
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  jobs:
+  - deployment: DeployDev
+    displayName: 'Deploy (RG: Revalion-resource-group-0)'
+    environment: 'dev'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+
+          - task: AzureWebApp@1
+            displayName: 'Deploy AuthAPI (AuthAPIWin)'
+            inputs:
+              azureSubscription: 'azs'
+              appType: 'webApp'
+              appName: 'AuthAPIWin'
+              package: '$(Pipeline.Workspace)/drop/AuthAPI.zip'
+
+          - task: AzureWebApp@1
+            displayName: 'Deploy TemplatesAPI (TemplatesAPIWin)'
+            inputs:
+              azureSubscription: 'azs'
+              appType: 'webApp'
+              appName: 'TemplatesAPIWin'
+              package: '$(Pipeline.Workspace)/drop/TemplatesAPI.zip'
+
+          - task: AzureWebApp@1
+            displayName: 'Deploy MainApp (RevalWApp)'
+            inputs:
+              azureSubscription: 'azs'
+              appType: 'webApp'
+              appName: 'RevalWApp'
+              package: '$(Pipeline.Workspace)/drop/MainApp.zip'

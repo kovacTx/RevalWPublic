@@ -1,0 +1,218 @@
+﻿@using RevalW.App.Utils
+@using RevalW.Shared.Utils
+@using RevalW.Services.Shared.Utils;
+@{
+    var isLogged = User?.Identity?.IsAuthenticated == true;
+    var canViewConfigs = User?.IsAuthorizedInAny(RightsList.ConfigRights) ?? false;
+    var canViewDevices = User?.IsAuthorizedInAny(RightsList.DeviceRights) ?? false;
+    var isCreator = isLogged && User?.IsInRole(ERoles.Creator) == true;
+    var isUberAdmin = isLogged && User?.IsInRole(ERoles.UberAdmin) == true;
+
+    var configManagementLabel = (isLogged && canViewConfigs) ? "Configs" : "Configs (visible if user have rights to)";
+    var deviceManagementLabel = (isLogged && canViewDevices) ? "Devices" : "Devices (visible if user have rights to)";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - RevalW Agenda</title>
+    @RenderSection("Meta", required: false)
+    <meta name="description"
+          content="RevalW Agenda helps manage forms, evaluate data, and generate professional printable PDF reports. Built on .NET 8 and Azure for security and reliability." />
+    <meta name="keywords"
+          content="agenda management, forms, offline formulars, formular platform, evaluation, metrology, metrology formular, revision, revision formular, calibration, calibration formular, PDF reports, .NET 8, Azure, workflow automation" />
+    <meta name="author" content="Revalion Software" />
+
+    <meta property="og:title" content="RevalW Agenda & Evaluation Platform" />
+    <meta property="og:description"
+          content="Manage and evaluate forms, track agendas, and create PDF reports with RevalW’s secure cloud-based platform." />
+    <meta property="og:type" content="website" />
+
+    <!-- Immediately apply saved theme before CSS loads to avoid flicker -->
+    <script>
+        (function () {
+            try {
+                var saved = localStorage.getItem('reval-theme');
+                if (!saved) saved = 'dark';
+                document.documentElement.setAttribute('data-bs-theme', saved);
+            } catch (e) { /* ignore */ }
+        })();
+    </script>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="//cdn.datatables.net/2.0.8/css/dataTables.dataTables.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.css" />
+    <link rel="stylesheet" href="~/RevalW.App.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">RevalW</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold" asp-area="" asp-controller="Home" asp-action="RevalM">RevalM</a>
+                        </li>
+                        @if (isUberAdmin)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Organization" asp-action="OrganizationIndex">Organizations management</a>
+                            </li>
+                        }
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Items" asp-action="ItemIndex">Items management</a>
+                        </li>
+
+                        @if (isUberAdmin || isCreator || canViewConfigs || !isLogged)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Configs" asp-action="ConfigsIndex">
+                                    @configManagementLabel
+                                </a>
+                            </li>
+                        }
+                        @if (isUberAdmin || isCreator || canViewDevices || !isLogged)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Devices" asp-action="DeviceIndex">
+                                    @deviceManagementLabel
+                                </a>
+                            </li>
+                        }
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="About">About</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        @if (isLogged)
+                        {
+                            <li class="nav-item">
+                                @if (isCreator || isUberAdmin)
+                                {
+                                    <a class="nav-link" asp-controller="Organization" asp-action="Organization">@User?.Identity?.Name</a>
+                                }
+                                else if (isLogged)
+                                {
+                                    <a class="nav-link" asp-controller="Users" asp-action="Update">@User?.Identity?.Name</a>
+                                }
+                                else
+                                {
+                                    <a class="nav-link">@User?.Identity?.Name</a>
+                                }
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Auth" asp-action="Logout">Logout</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Auth" asp-action="Login">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Auth" asp-action="Register">Register</a>
+                            </li>
+                        }
+                        <li class="nav-item">
+                            <button id="themeToggle" class="nav-link d-flex align-items-center">
+                                <i id="themeToggleIcon" class="bi bi-moon-fill me-1" aria-hidden="true"></i>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+            <partial name="_Notifications" />
+        </main>
+    </div>
+
+    <footer class="footer text-muted">
+        <div class="container">
+            &copy; 2025 - Revalion Software <a href="mailto:revalion22@hotmail.com">revalion22@hotmail.com</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="//cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
+
+    <script>
+        (function () {
+            function applyTheme(theme) {
+                try {
+                    document.documentElement.setAttribute('data-bs-theme', theme);
+                } catch (e) { /* ignore */ }
+
+                try {
+                    localStorage.setItem('reval-theme', theme);
+                } catch (e) { /* ignore */ }
+
+                // Update toggle UI
+                var icon = document.getElementById('themeToggleIcon');
+                var text = document.getElementById('themeToggleText');
+                if (icon) {
+                    if (theme === 'dark') {
+                        icon.className = 'bi bi-moon-fill me-1';
+                    } else {
+                        icon.className = 'bi bi-sun-fill me-1';
+                    }
+                }
+                if (text) {
+                    text.textContent = theme === 'dark' ? 'Dark' : 'Light';
+                }
+
+                // If Monaco is present, switch theme there as well.
+                // Try to set a custom dark theme name first, fallback to vs-dark.
+                if (window.monaco && window.monaco.editor && typeof window.monaco.editor.setTheme === 'function') {
+                    try {
+                        if (theme === 'dark') {
+                            // try to use custom dark theme (if defined on the page)
+                            window.monaco.editor.setTheme('reval-dark-enhanced');
+                        } else {
+                            window.monaco.editor.setTheme('vs');
+                        }
+                    } catch (e) {
+                        // fallback
+                        try {
+                            window.monaco.editor.setTheme(theme === 'dark' ? 'vs-dark' : 'vs');
+                        } catch (e2) { /* ignore */ }
+                    }
+                }
+            }
+
+            // Initialize toggle button state and click handler
+            document.addEventListener('DOMContentLoaded', function () {
+                var saved = 'dark';
+                try {
+                    saved = localStorage.getItem('reval-theme') || saved;
+                } catch (e) { /* ignore */ }
+
+                applyTheme(saved);
+
+                var toggle = document.getElementById('themeToggle');
+                if (toggle) {
+                    toggle.addEventListener('click', function () {
+                        var current = document.documentElement.getAttribute('data-bs-theme') || 'dark';
+                        var next = current === 'dark' ? 'light' : 'dark';
+                        applyTheme(next);
+                    }, false);
+                }
+            });
+        })();
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
